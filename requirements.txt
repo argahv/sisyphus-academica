@@ -17,5 +17,5 @@ matplotlib>=3.7       # Base plotting
 requests>=2.31
 
 # Development
-pytest>=7.4           # Test runner
+pytest>=9.0.3           # Test runner
 pytest-mock>=3.11     # Mocking for API tests
