@@ -4,6 +4,7 @@ First off — thanks for being here. This project needs people who can write, re
 
 ## Table of Contents
 
+- [First-Time Contributors](#first-time-contributors)
 - [Code of Conduct](#code-of-conduct)
 - [What Kind of Contributions We Need](#what-kind-of-contributions-we-need)
 - [Getting Started](#getting-started)
@@ -19,6 +20,14 @@ First off — thanks for being here. This project needs people who can write, re
 - [Code Style](#code-style)
 - [Pull Request Process](#pull-request-process)
 - [The Quality Gates](#the-quality-gates)
+
+## First-Time Contributors
+
+Never contributed to open source before? Start with the **[First-Contributor Guide](docs/first-contributor.md)** — it covers every step from forking the repo to getting your PR merged, with no assumed experience.
+
+Looking for something to work on? Filter issues by [`good-first-issue`](https://github.com/argahv/sisyphus-academica/labels/good-first-issue) or [`help-wanted`](https://github.com/argahv/sisyphus-academica/labels/help-wanted).
+
+---
 
 ## Code of Conduct
 
@@ -240,6 +249,8 @@ flake8 tools/ --max-line-length=100 --ignore=E501,W291
 - Prefer `requests` over `urllib` for new code
 
 ## Pull Request Process
+
+> New to pull requests? See the [First-Contributor Guide](docs/first-contributor.md) for a full walkthrough.
 
 1. **Fork the repo** and create your branch from `main`
 2. **If adding code, add tests first** (or at minimum verify existing tests pass)
