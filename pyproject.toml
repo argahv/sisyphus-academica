@@ -34,3 +34,8 @@ packages = []
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
+
+[tool.flake8]
+max-line-length = 100
+ignore = ["E501", "W291"]
+extend-exclude = ["__pycache__"]
