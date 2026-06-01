@@ -7,7 +7,7 @@
 # Agent-defined packages used at runtime (installed by data-engineer subagent)
 # These are referenced in agent prompts, not imported by the Python tools:
 scienceplots>=2.0     # Publication-quality matplotlib styles
-seaborn>=0.12         # Statistical data visualization
+seaborn>=0.13.2         # Statistical data visualization
 scipy>=1.10           # Statistical tests, signal processing
 scikit-learn>=1.3     # ML metrics, preprocessing
 statsmodels>=0.14     # Statistical modeling
