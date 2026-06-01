@@ -141,17 +141,43 @@ def verify_citations(findings: Dict) -> Dict:
     }
 
 
+def format_authors_for_bibtex(authors) -> str:
+    """Format author list into BibTeX 'Last, I. and ...' string.
+
+    Handles list of strings (['John Smith']) or dicts ([{'name': 'John Smith'}]).
+    Falls back to 'Author, A.' on empty/invalid input.
+    """
+    if not isinstance(authors, (list, tuple)) or not authors:
+        return 'Author, A.'
+
+    names = []
+    for a in authors:
+        name = a.strip() if isinstance(a, str) else (a.get('name', '').strip() if isinstance(a, dict) else '')
+        if not name:
+            continue
+        parts = name.split()
+        if len(parts) == 1:
+            names.append(parts[0])
+        else:
+            last = parts[-1]
+            initials = ' '.join(p[0] + '.' for p in parts[:-1] if p)
+            names.append(f'{last}, {initials}')
+    return ' and '.join(names) if names else 'Author, A.'
+
+
 def generate_bibtex(paper: Dict) -> str:
     """Generate BibTeX entry from verified paper metadata."""
     if not paper.get('doi'):
         return ''
-    
+
     doi = paper['doi']
-    author_field = 'Author, A.'
+    author_field = format_authors_for_bibtex(paper.get('authors', []))
     title_field = paper.get('title', 'Untitled')
     year = paper.get('year', 'n.d.')
-    key = f"{author_field.split(',')[0]}{year}"
-    
+
+    first_author = author_field.split(',')[0].split(' and ')[0].strip()
+    key = f"{first_author}{year}"
+
     bibtex = f"""@article{{{key},
   author = {{{author_field}}},
   title = {{{title_field}}},

@@ -8,7 +8,12 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
 
-from citation_verifier import verify_citation, verify_citations, generate_bibtex
+from citation_verifier import (
+    format_authors_for_bibtex,
+    verify_citation,
+    verify_citations,
+    generate_bibtex,
+)
 
 
 class TestVerifyCitation:
@@ -72,6 +77,42 @@ class TestVerifyCitations:
         assert isinstance(result["hallucinated_citations"], list)
 
 
+class TestFormatAuthorsForBibtex:
+    """format_authors_for_bibtex() — pure formatting."""
+
+    def test_empty_list_returns_fallback(self):
+        assert format_authors_for_bibtex([]) == "Author, A."
+
+    def test_none_returns_fallback(self):
+        assert format_authors_for_bibtex(None) == "Author, A."
+
+    def test_non_list_returns_fallback(self):
+        assert format_authors_for_bibtex("not a list") == "Author, A."
+
+    def test_single_author_string(self):
+        assert format_authors_for_bibtex(["John Smith"]) == "Smith, J."
+
+    def test_multiple_authors_strings(self):
+        result = format_authors_for_bibtex(["John Smith", "Jane Doe"])
+        assert result == "Smith, J. and Doe, J."
+
+    def test_author_dict_with_name_key(self):
+        result = format_authors_for_bibtex([{"name": "John Smith"}])
+        assert result == "Smith, J."
+
+    def test_author_middle_name(self):
+        result = format_authors_for_bibtex(["John A. Smith"])
+        assert result == "Smith, J. A."
+
+    def test_single_word_name_preserved(self):
+        result = format_authors_for_bibtex(["Einstein"])
+        assert result == "Einstein"
+
+    def test_mixed_empty_and_valid(self):
+        result = format_authors_for_bibtex(["", "John Smith", None])
+        assert result == "Smith, J."
+
+
 class TestGenerateBibtex:
     """generate_bibtex() — pure string formatting."""
 
@@ -81,7 +122,7 @@ class TestGenerateBibtex:
     def test_returns_empty_for_missing_doi_key(self):
         assert generate_bibtex({"title": "Test"}) == ""
 
-    def test_returns_bibtex_string_for_valid_paper(self):
+    def test_returns_bibtex_string_without_authors(self):
         paper = {
             "doi": "10.1234/test.2024.001",
             "title": "A Test Paper",
@@ -91,9 +132,73 @@ class TestGenerateBibtex:
         assert bib.startswith("@article{")
         assert "10.1234/test.2024.001" in bib
         assert "A Test Paper" in bib
+        assert "Author, A." in bib
         assert bib.endswith("}")
 
     def test_bibtex_includes_year(self):
         paper = {"doi": "10.1/abc", "title": "T", "year": 2023}
         bib = generate_bibtex(paper)
         assert "2023" in bib
+
+    def test_bibtex_with_string_authors(self):
+        paper = {
+            "doi": "10.1234/test.2024.001",
+            "title": "A Test Paper",
+            "year": 2024,
+            "authors": ["John Smith", "Jane Doe"],
+        }
+        bib = generate_bibtex(paper)
+        assert "Smith, J." in bib
+        assert "Doe, J." in bib
+        assert bib.split(",")[0].split("{")[-1] == "Smith2024"
+
+    def test_bibtex_with_dict_authors(self):
+        paper = {
+            "doi": "10.1234/test.2024.001",
+            "title": "A Test Paper",
+            "year": 2024,
+            "authors": [{"name": "John Smith"}, {"name": "Jane Doe"}],
+        }
+        bib = generate_bibtex(paper)
+        assert "Smith, J." in bib
+        assert "Doe, J." in bib
+        assert bib.split(",")[0].split("{")[-1] == "Smith2024"
+
+    def test_bibtex_with_single_author(self):
+        paper = {
+            "doi": "10.1/single.2023",
+            "title": "Single Author",
+            "year": 2023,
+            "authors": ["Einstein"],
+        }
+        bib = generate_bibtex(paper)
+        assert "Einstein" in bib
+        assert "Einstein2023" in bib
+
+    def test_bibtex_with_empty_authors_falls_back(self):
+        paper = {"doi": "10.1/fallback", "title": "Fallback", "year": 2024, "authors": []}
+        bib = generate_bibtex(paper)
+        assert "Author, A." in bib
+        assert "Authorn.d." not in bib
+
+    def test_bibtex_key_uses_first_author_last_name(self):
+        paper = {
+            "doi": "10.1/keytest",
+            "title": "Key Test",
+            "year": 2023,
+            "authors": ["Ada Lovelace", "Charles Babbage"],
+        }
+        bib = generate_bibtex(paper)
+        assert bib.startswith("@article{Lovelace2023,")
+
+    def test_bibtex_formats_and_separator(self):
+        paper = {
+            "doi": "10.1/andtest",
+            "title": "And Test",
+            "year": 2022,
+            "authors": ["Alice Alpha", "Bob Beta"],
+        }
+        bib = generate_bibtex(paper)
+        assert " and " in bib
+
+
