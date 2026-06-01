@@ -65,7 +65,7 @@ You do not need to run the full paper pipeline to contribute. Most contributions
 ```bash
 pip install -r requirements.txt
 python -m pytest tests/ -v   # should pass
-flake8 tools/ --max-line-length=100   # should pass
+flake8 tools/   # should pass
 ```
 
 ### Full (for running the pipeline)
@@ -183,7 +183,7 @@ The two Python tools (`literature_client.py` and `citation_verifier.py`) are sel
 **Guidelines:**
 - Keep the CLI interface (argparse) backward-compatible
 - Add tests for any new logic
-- Run `flake8 tools/ --max-line-length=100` before committing
+- Run `flake8 tools/` before committing
 
 ### Improving Agent Prompts
 
@@ -225,7 +225,7 @@ python -m pytest tests/ --cov=tools
 
 ```bash
 # Python
-flake8 tools/ --max-line-length=100 --ignore=E501,W291
+flake8 tools/
 
 # Markdown
 # - One sentence per line in agent prompts (easier to diff)
@@ -259,7 +259,7 @@ Examples:
 
 **Checklist for every PR:**
 - [ ] Tests pass (`python -m pytest tests/ -v`)
-- [ ] Flake8 passes (`flake8 tools/ --max-line-length=100`)
+- [ ] Flake8 passes (`flake8 tools/`)
 - [ ] New functions have type hints and docstrings
 - [ ] Agent prompt changes preserve existing output format
 - [ ] Python tools remain backward-compatible (argparse unchanged)

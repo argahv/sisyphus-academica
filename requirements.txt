@@ -16,3 +16,5 @@ matplotlib>=3.7       # Base plotting
 # Development
 pytest>=7.4           # Test runner
 pytest-mock>=3.11     # Mocking for API tests
+flake8>=7.3           # Linter
+flake8-pyproject>=1.2 # Read flake8 settings from pyproject.toml

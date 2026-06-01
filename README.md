@@ -225,8 +225,7 @@ pip install -r requirements.txt
 python -m pytest tests/ -v
 
 # Lint
-pip install flake8
-flake8 tools/ --max-line-length=100
+flake8 tools/
 
 # LaTeX compilation (via Docker)
 docker compose --profile latex run latex pdflatex out/papers/paper.tex
