@@ -1,5 +1,7 @@
 # Runtime data
-data/
+data/out/
+data/papers/
+data/research-memory/
 out/
 .env
 
