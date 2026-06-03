@@ -12,6 +12,8 @@
 [![GitHub Stars](https://img.shields.io/github/stars/argahv/sisyphus-academica?style=social)](https://github.com/argahv/sisyphus-academica)
 [![Star History](https://api.star-history.com/svg?repos=argahv/sisyphus-academica&type=Date)](https://star-history.com/#argahv/sisyphus-academica)
 
+**Translations:** [中文](README_ZH.md) | [한국어](README_KO.md) | [日本語](README_JA.md)
+
 </div>
 
 Not a writing assistant. Not a chatbot with a LaTeX plugin. A **self-coordinating swarm** of 20+ specialized agents that produces publication-ready research papers with **genuine novelty, zero hallucinated citations, and no detectable AI-written patterns.**
