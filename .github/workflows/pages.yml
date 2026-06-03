@@ -25,7 +25,7 @@ jobs:
         working-directory: docs
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/configure-pages@v4
+      - uses: actions/configure-pages@v6
       - uses: actions/jekyll-build-pages@v1
       - uses: actions/upload-pages-artifact@v3
 
