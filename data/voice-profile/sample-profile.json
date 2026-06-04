@@ -1,0 +1,28 @@
+{
+  "profile_name": "Sample Academic Voice",
+  "source_file": "sample-writing.txt",
+  "metrics": {
+    "total_words": 198,
+    "total_sentences": 9,
+    "avg_sentence_length": 22.0,
+    "sentence_length_std": 5.8,
+    "unique_words": 125,
+    "vocabulary_richness": 0.63,
+    "passive_voice_ratio": 0.22,
+    "avg_paragraphs_per_section": 1.0,
+    "avg_sentences_per_paragraph": 4.5
+  },
+  "style_signals": {
+    "transition_patterns": ["however", "specifically", "to address this", "these results suggest"],
+    "citation_habit": "parenthetical_end",
+    "formality_level": "formal",
+    "hedging_frequency": 0.11,
+    "technical_jargon_density": 0.08
+  },
+  "voice_consistency_rules": {
+    "max_sentence_length_deviation": 8.0,
+    "min_vocabulary_richness": 0.45,
+    "max_passive_voice_ratio": 0.35,
+    "allowed_transitions": ["contrast", "elaboration", "result", "conclusion"]
+  }
+}
