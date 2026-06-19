@@ -266,22 +266,22 @@ The pipeline was run to produce a full paper on **Intent-Based Blockchain Execut
 
 ## FAQ
 
-**Q: Does this require a specific LLM provider?**  
+**Q: Does this require a specific LLM provider?**
 No. Edit `config/agent-config.json` to use any OpenAI-compatible or Anthropic API.
 
-**Q: Can I add my own LaTeX template?**  
+**Q: Can I add my own LaTeX template?**
 Yes. Add a folder under `templates/` with `.tex`, `.sty`, and `.cls` files, then update `subagents/formatter.md`.
 
-**Q: How long does a paper take?**  
+**Q: How long does a paper take?**
 30 minutes to 4 hours depending on LLM speed, literature volume, and revision rounds.
 
-**Q: The output sounds too AI-like. What do I do?**  
+**Q: The output sounds too AI-like. What do I do?**
 Provide 2-3 paragraphs of your published writing in `data/voice-profile/`. The writers will match your voice at the sentence level.
 
-**Q: Can I use this without OpenCode?**  
+**Q: Can I use this without OpenCode?**
 The agents are OpenCode-compatible, but the Python CLI tools (`tools/literature_client.py`, `tools/citation_verifier.py`) work standalone.
 
-**Q: How do I contribute?**  
+**Q: How do I contribute?**
 See [CONTRIBUTING.md](CONTRIBUTING.md). Good first issues are tagged. Template stubs need filling, the PyPI package needs publishing, and more reviewer personas are welcome.
 
 ---
@@ -320,6 +320,39 @@ flake8 tools/ --max-line-length=100
 # LaTeX via Docker
 docker compose --profile latex run latex pdflatex out/papers/paper.tex
 ```
+---
+
+## Docker
+
+Run the CLI without installing anything locally.
+
+### Demo
+
+```bash
+docker run --rm ghcr.io/argahv/sisyphus-academica:latest demo
+```
+
+### Help
+
+```bash
+docker run --rm ghcr.io/argahv/sisyphus-academica:latest --help
+```
+
+### Run Pipeline
+
+Requires an Anthropic API key:
+
+```bash
+export ANTHROPIC_API_KEY=your_key_here
+
+docker run --rm \
+  -e ANTHROPIC_API_KEY \
+  -v $(pwd)/out:/app/out \
+  ghcr.io/argahv/sisyphus-academica:latest \
+  write "your research topic"
+```
+
+Generated files will be saved to `./out`.
 
 ---
 
