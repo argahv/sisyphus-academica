@@ -320,6 +320,39 @@ flake8 tools/ --max-line-length=100
 # LaTeX via Docker
 docker compose --profile latex run latex pdflatex out/papers/paper.tex
 ```
+---
+
+## Docker
+
+Run the CLI without installing anything locally.
+
+### Demo
+
+```bash
+docker run --rm ghcr.io/argahv/sisyphus-academica:latest demo
+```
+
+### Help
+
+```bash
+docker run --rm ghcr.io/argahv/sisyphus-academica:latest --help
+```
+
+### Run Pipeline
+
+Requires an Anthropic API key:
+
+```bash
+export ANTHROPIC_API_KEY=your_key_here
+
+docker run --rm \
+  -e ANTHROPIC_API_KEY \
+  -v $(pwd)/out:/app/out \
+  ghcr.io/argahv/sisyphus-academica:latest \
+  write "your research topic"
+```
+
+Generated files will be saved to `./out`.
 
 ---
 
@@ -337,10 +370,3 @@ docker compose --profile latex run latex pdflatex out/papers/paper.tex
 MIT — see [LICENSE](LICENSE) for details.
 
 ⭐ **Star this repo if you write research papers — it helps others find it.**
-
-## Docker Usage
-
-You can run the CLI tool directly using the Docker image published on GitHub Container Registry (GHCR):
-
-```bash
-docker run --rm -it ghcr.io/argahv/sisyphus-academica:latest --help
