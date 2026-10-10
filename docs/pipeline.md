@@ -20,6 +20,21 @@ The paper pipeline runs 10 sequential phases. Verification and review phases can
   <span class="timeline-pill pill-done">Formatter</span>
 </div>
 
+## Handoffs
+
+Each paper lives in <code>out/papers/&lt;slug&gt;/</code> (created by <code>sisyphus new</code>). Every stage writes known files there, and <code>sisyphus check RUN STAGE</code> validates them before the next stage starts.
+
+| Phase | Writes | Checked by |
+|-------|--------|------------|
+| 0 | <code>data/voice-profile.json</code> | <code>sisyphus voice</code> |
+| 1 | <code>literature/*.json</code>, <code>literature/corpus.json</code>, <code>gaps.json</code> | <code>check literature</code>, <code>check gaps</code> |
+| 1.5 | <code>novelty/&lt;engine&gt;.json</code>, <code>novelty/ranked.json</code> | <code>sisyphus novelty</code> (flags evidence not in the corpus) |
+| 2-4 | <code>hypothesis.json</code>, <code>methodology.json</code>, <code>analysis/statistics.json</code>, <code>references.json</code> | <code>check hypothesis</code> ... <code>check references</code> (every reference verified in 2+ APIs) |
+| 5 | <code>outline.json</code>, <code>draft/&lt;section&gt;.tex</code> | <code>check outline</code>, <code>check draft</code> (only verified cite keys) |
+| 6, 9 | <code>verification/*.json</code> | <code>sisyphus gate verify</code>, <code>sisyphus gate style</code> |
+| 7 | <code>reviews/&lt;persona&gt;.json</code> | <code>sisyphus gate reviews</code> |
+| 10 | <code>build/paper.tex</code>, <code>references.bib</code>, <code>paper.pdf</code> | <code>sisyphus build</code> (refuses unless all gates passed on this draft) |
+
 ## Phase 0: Voice Calibration
 
 **Input:** 2-3 paragraphs of the author's published writing
@@ -33,7 +48,7 @@ The profile is loaded by every Writer agent. Writers match the author's voice at
 
 | Scout | Source | Max Results |
 |-------|--------|-------------|
-| 1 | arXiv OAI-PMH | 200 |
+| 1 | arXiv REST API | 100 |
 | 2 | Semantic Scholar | 100 |
 | 3 | CrossRef | 50 |
 | 4 | OpenAlex | 50 |
@@ -111,7 +126,7 @@ Complete paper scanned for all 41 patterns:
 
 Formatter loads venue-specific LaTeX template, generates BibTeX from verified citations, embeds figures, compiles PDF. Outputs: <code>paper.tex</code>, <code>references.bib</code>, <code>paper.pdf</code>.
 
-Supported venue templates: NeurIPS, ICML, ICLR, ACL, Nature/Springer, arXiv.
+Supported venue templates: NeurIPS, ICML, ICLR, Nature/Springer, arXiv.
 
 <div class="button-group">
   <a href="{{ '/architecture' | relative_url }}" class="btn-secondary">Architecture</a>

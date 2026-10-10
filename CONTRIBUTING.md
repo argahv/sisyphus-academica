@@ -114,7 +114,6 @@ sisyphus-academica/
 ├── data/                  # Research memory + voice profiles
 ├── out/                   # Generated papers and figures
 ├── tests/                 # Python tool tests
-├── hooks/                 # Git hooks (optional)
 ├── examples/              # Pipeline output examples
 ├── requirements.txt       # Python dependencies
 ├── pyproject.toml         # Package metadata
@@ -158,7 +157,7 @@ Novelty engines are the heart of the system. Each is a single markdown file.
    permission:
      "*": deny
      read: { "*": allow }
-     write: { /root/sisyphus-academica/out/papers/*: allow }
+     write: { "{{SISYPHUS_DIR}}/out/papers/*": allow }
      bash: deny
      webfetch: allow
      task: deny
@@ -166,7 +165,8 @@ Novelty engines are the heart of the system. Each is a single markdown file.
    ---
    ```
 4. Add the engine to the workflow in `orchestrator/research-director.md`
-5. Add it to `config/agent-config.json`
+5. Add it to `config/agent-config.json` and to `ENGINES` in `tools/workspace.py`
+6. Copy the prompt body (everything after the frontmatter) to `skills/<name>/SKILL.md`; `tests/test_agents.py` checks the two stay identical
 
 ### Adding a Reviewer Persona
 
@@ -175,24 +175,24 @@ Reviewers are single markdown files with a defined persona and evaluation criter
 1. Create `reviewers/your-persona.md`
 2. Follow the existing pattern: frontmatter + persona description + questions + rating dimensions
 3. Keep it to 25-30 lines — concise, sharp, opinionated
-4. Add it to the orchestrator workflow and agent-config.json
+4. End with the shared `## OUTPUT` JSON block the other reviewers use (the review gate parses it)
+5. Add it to `config/agent-config.json`, to `PERSONAS` in `tools/reviews.py`, and copy the body to `skills/<name>/SKILL.md`
 
 ### Improving Python Tools
 
-The two Python tools (`literature_client.py` and `citation_verifier.py`) are self-contained CLI scripts using only the stdlib.
+The tools in `tools/` use only the standard library and are exposed through the `sisyphus` CLI (`src/sisyphus/cli.py`). Each module can also run as a script (`python3 tools/patterns.py FILE`).
 
 **Common improvements:**
-- Add `requests` library for cleaner HTTP calls
 - Implement API pagination (each source returns multiple pages)
-- Add exponential backoff retry for rate limits
-- Expand citation format extraction beyond `[bracket]` syntax
-- Parallelize API calls instead of sequential `time.sleep`
-- Improve `deduplicate_papers` with fuzzy matching
+- Add more citation sources to `tools/citation_verifier.py` (for example PubMed for biomedical papers)
+- Sharpen a heuristic pattern in `tools/patterns.py` (add a positive and a negative example to `tests/test_patterns.py`)
+- Add statistical checks to `tools/stats_audit.py` (for example effect size vs test statistic consistency)
 
 **Guidelines:**
 - Keep the CLI interface (argparse) backward-compatible
 - Add tests for any new logic
-- Run `flake8 tools/ --max-line-length=100` before committing
+- Run `flake8 tools/ src/ tests/ --max-line-length=100` before committing
+- Tests must stay offline: `tests/conftest.py` blocks real HTTP; use the `fake_api` fixture
 
 ### Improving Agent Prompts
 

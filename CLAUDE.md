@@ -8,7 +8,8 @@ You are working on an open-source academic research pipeline. The goal is to hel
 - `subagents/` — 8 writing pipeline agents (writer, verifier, style-auditor, etc.)
 - `novelty-engines/` — 6 novelty generation agents (contrarian, heretic, etc.)
 - `reviewers/` — 10 adversarial reviewer personas
-- `tools/` — Python CLI tools (literature search, citation verification)
+- `tools/` — Python tools behind the `sisyphus` CLI (literature search, citation verification, the five quality gates, LaTeX build)
+- `src/sisyphus/` — `sisyphus` CLI entry point and the bundled demo paper run
 - `skills/` — Portable agent skills (novelty engines, reviewers as standalone SKILL.md files)
 - `templates/` — LaTeX venue templates (NeurIPS, ICML, ICLR, Nature, arXiv)
 

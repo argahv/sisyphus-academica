@@ -26,17 +26,28 @@ bash install.sh
 
 ## CLI Tools (No Agent Required)
 
-The Python CLI works standalone — no OpenCode or agent platform needed:
+The Python CLI works standalone — no OpenCode or agent platform needed, and no dependencies beyond the Python 3.10+ standard library:
 
 ```bash
 git clone https://github.com/argahv/sisyphus-academica.git && cd sisyphus-academica
-pip install -e .
+pip install -e .           # or run bin/sisyphus without installing
 
-sisyphus demo              # Interactive pipeline demo (no API keys)
-sisyphus search QUERY      # Search 4 academic APIs in parallel
-sisyphus verify FILE       # Verify citations in a paper JSON
+sisyphus demo              # Run all five quality gates on a bundled example paper (offline, no API keys)
+sisyphus search QUERY      # Search arXiv, Semantic Scholar, CrossRef and OpenAlex in parallel
+sisyphus verify FILE       # Verify citations in a paper JSON, .bib or .tex against 2+ APIs
 sisyphus bibtex DOI        # Generate BibTeX from a DOI
-sisyphus configure         # Set up API keys interactively
+sisyphus configure         # Set up API keys in .env
+```
+
+The same CLI runs the paper pipeline for the agents, and you can call it yourself:
+
+```bash
+sisyphus new "TOPIC"                 # create out/papers/<slug>/ for one paper
+sisyphus gate patterns draft.tex     # 41 AI-writing patterns + em dash count
+sisyphus gate statistics paper.tex   # recompute p-values, check CIs and abstract numbers
+sisyphus gate all RUN                # all five gates on a paper run
+sisyphus status RUN                  # which stages and gates are done
+sisyphus build RUN                   # LaTeX + BibTeX + PDF, refused until every gate passes
 ```
 
 ---
@@ -127,7 +138,7 @@ bash install.sh --yes
 | Time to first draft | 5-20 min | **30 min - 4 hours** (reviewed) |
 
 **Pipeline stats from our SIREN paper** ([view output](examples/siren-paper/)):
-100+ papers surveyed → 6 novelty engines → 50+ hypotheses → 10 adversarial reviewers → 4 revision rounds → **13-page PDF, 26 verified citations, 3 publication-ready figures, 0 AI-pattern violations, 0 em dashes, 0 hallucinated references.**
+100+ papers surveyed → 6 novelty engines → 50+ hypotheses → 10 adversarial reviewers → 4 revision rounds → **13-page PDF with 20 cited references and 2 embedded figures.** The example predates the code-enforced gates; [its README](examples/siren-paper/README.md#consistency-with-the-current-pipeline) lists what the current gates flag in it.
 
 ---
 
@@ -139,9 +150,8 @@ git clone https://github.com/argahv/sisyphus-academica.git
 cd sisyphus-academica
 bash install.sh
 
-# 2. Configure API keys (free)
-cp .env.example .env
-# Add your Semantic Scholar API key + CrossRef email
+# 2. Configure API keys (free, optional; install.sh asks for them too)
+sisyphus configure --semantic-scholar-key KEY --crossref-email you@university.edu
 
 # 3. Write a paper
 # OpenCode → agent tab → select "research-director"
@@ -150,18 +160,22 @@ cp .env.example .env
 
 **Prerequisites:** OpenCode (or compatible agent platform), Python 3.10+, LaTeX (optional, for PDF).
 
-**Provider-agnostic** — works with any OpenAI-compatible or Anthropic API. Edit `config/agent-config.json` to switch models:
+**Provider-agnostic** — works with any OpenAI-compatible or Anthropic API. Edit `config/agent-config.json` to switch models, then re-run `bash install.sh` to apply them to the installed agents:
 
 ```json
 {
+  "default_model": "anthropic/claude-sonnet-4",
   "agents": {
     "research-director": {
       "model": "anthropic/claude-opus-4",
       "fallback_models": [{"model": "anthropic/claude-sonnet-4"}]
-    }
+    },
+    "literature-scout": { "model": "openai/gpt-4o" }
   }
 }
 ```
+
+Agents without their own `model` use `default_model`. Set `LLM_PROVIDER` in `.env` to give every agent the same model.
 
 ---
 
@@ -239,13 +253,13 @@ Each paper is independently reviewed by 10 distinct personas running in parallel
 
 ## Quality Gates
 
-Every paper passes through 5 hard gates. **If any gate fails, the paper goes back to revision.**
+Every paper passes through 5 hard gates. They are enforced in code (`sisyphus gate`), and `sisyphus build` refuses to format a draft unless all five passed on that exact draft. **If any gate fails, the paper goes back to revision.**
 
-1. **Citation Verification** — Every reference checked against Semantic Scholar + CrossRef APIs. Must be found in 2+ sources. No exceptions.
-2. **Statistical Audit** — Every p-value, effect size, sample size, and test selection validated. No p-hacking, no multiple comparison errors.
-3. **AI-Pattern Detection** — 41 Humanizer patterns scanned. Density must be < 2 violations per 1000 words.
-4. **Style Audit** — Zero em dashes. Pattern density < 1/2000 words. Voice must match the author's writing profile.
-5. **Adversarial Review** — All 10 reviewer personas must recommend acceptance. Not a subset. All 10.
+1. **Citation Verification** — Every reference looked up in Semantic Scholar, CrossRef, OpenAlex and arXiv. Title, year and authors must match in 2+ sources. Cited keys without a verified entry block the paper.
+2. **Statistical Audit** — p-values recomputed from t, F, χ², z and r statistics; "significant" with p > .05, impossible values, estimates outside their CI, missing multiple-comparison correction and abstract numbers missing from the body are all errors. Every reported test must appear in the analysis output.
+3. **AI-Pattern Detection** — 41 Humanizer patterns scanned. Density must be < 2 violations per 1000 words, and zero em dashes.
+4. **Style Audit** — Zero em dashes. Pattern density < 1/2000 words. Voice must match the author's writing profile (when one exists).
+5. **Adversarial Review** — All 10 reviewer personas must recommend acceptance with no open must-fix items. Not a subset. All 10.
 
 ---
 
@@ -256,8 +270,8 @@ The pipeline was run to produce a full paper on **Intent-Based Blockchain Execut
 | File | Description |
 |------|-------------|
 | `siren-paper.pdf` | 13-page compiled paper |
-| `siren-paper.tex` | LaTeX source (504 lines, 26 references) |
-| `figures/*.pdf` | 3 publication-ready figures |
+| `siren-paper.tex` | LaTeX source (508 lines, 20 cited references) |
+| `figures/*.pdf` | 3 figures (2 embedded in the paper) |
 | `README.md` | Pipeline summary with review scores |
 
 **Review scores progressed from Avg 4.6/10 → 8/10 across 4 revision rounds.**
@@ -270,16 +284,16 @@ The pipeline was run to produce a full paper on **Intent-Based Blockchain Execut
 No. Edit `config/agent-config.json` to use any OpenAI-compatible or Anthropic API.
 
 **Q: Can I add my own LaTeX template?**  
-Yes. Add a folder under `templates/` with `.tex`, `.sty`, and `.cls` files, then update `subagents/formatter.md`.
+Yes. Add `templates/<venue>/template.tex` (plus any `.sty`, `.cls` or `.bst` files). Put `<<title>>`, `<<authors>>` and one `<<section_name>>` placeholder per section where the content goes; `sisyphus new "topic" --venue <venue>` then plans those sections and `sisyphus build` fills them.
 
 **Q: How long does a paper take?**  
 30 minutes to 4 hours depending on LLM speed, literature volume, and revision rounds.
 
 **Q: The output sounds too AI-like. What do I do?**  
-Provide 2-3 paragraphs of your published writing in `data/voice-profile/`. The writers will match your voice at the sentence level.
+Put 2-3 paragraphs of your published writing in `data/voice-profile/*.txt` and run `sisyphus voice`. Writers get the measured profile (sentence length, punctuation, hedging, use of "we") as guidance, and the style gate checks the draft against it.
 
 **Q: Can I use this without OpenCode?**  
-The agents are OpenCode-compatible, but the Python CLI tools (`tools/literature_client.py`, `tools/citation_verifier.py`) work standalone.
+The agents are OpenCode-compatible, but the `sisyphus` CLI (search, citation verification, BibTeX, the five quality gates and the LaTeX build) works standalone.
 
 **Q: How do I contribute?**  
 See [CONTRIBUTING.md](CONTRIBUTING.md). Good first issues are tagged. Template stubs need filling, the PyPI package needs publishing, and more reviewer personas are welcome.
@@ -295,13 +309,21 @@ sisyphus-academica/
 ├── novelty-engines/       # 6 novelty generation agents
 ├── reviewers/             # 10 adversarial reviewer personas
 ├── skills/                # 17 portable skill files (also available as standalone [novelty-skills](https://github.com/argahv/novelty-skills) repo)
-├── tools/                 # Python CLI toolchain
+├── tools/                 # Python toolchain (stdlib only)
 │   ├── literature_client.py    # Multi-source lit search
-│   └── citation_verifier.py    # Citation verification + BibTeX
+│   ├── citation_verifier.py    # Citation verification + BibTeX
+│   ├── patterns.py             # 41 AI-writing patterns + em dashes
+│   ├── stats_audit.py          # Statistical audit
+│   ├── voice.py                # Voice profile build + check
+│   ├── reviews.py              # 10-reviewer gate
+│   ├── gates.py / build.py     # Gate runner, LaTeX/PDF formatter
+│   └── workspace.py            # Paper run layout + stage handoff checks
+├── src/sisyphus/          # `sisyphus` CLI + bundled demo paper
+├── bin/sisyphus           # Run the CLI without installing
 ├── templates/             # LaTeX venue templates (add yours)
 ├── config/                # Agent configuration
 ├── examples/siren-paper/  # Full pipeline output (13-page paper)
-├── data/                  # Research memory + voice profiles
+├── data/                  # Your voice samples + profile (created by configure, gitignored)
 ├── tests/                 # Python unit tests
 ├── docs/                  # GitHub Pages documentation
 ├── docker-compose.yml     # LaTeX + dev environments
@@ -313,12 +335,12 @@ sisyphus-academica/
 ## Development
 
 ```bash
-pip install -r requirements.txt
-python -m pytest tests/ -v
-flake8 tools/ --max-line-length=100
+pip install -e ".[dev]"
+python -m pytest tests/ -v          # offline: all API calls are stubbed
+flake8 tools/ src/ tests/ --max-line-length=100
 
-# LaTeX via Docker
-docker compose --profile latex run latex pdflatex out/papers/paper.tex
+# PDF without a local TeX install
+sisyphus build out/papers/<slug> --docker
 ```
 
 ---

@@ -18,7 +18,9 @@ python -m pytest tests/ -v
 | `novelty-engines/heretic.md` | Crown jewel novelty engine |
 | `tools/literature_client.py` | Multi-source literature search |
 | `tools/citation_verifier.py` | Citation verification + BibTeX |
-| `skills/novelty-engines/contrarian.md` | Portable contrarian skill |
+| `skills/contrarian/SKILL.md` | Portable contrarian skill |
+| `tools/gates.py` | The five quality gates, enforced in code |
+| `src/sisyphus/cli.py` | `sisyphus` command line |
 | `pyproject.toml` | Package config for pip install |
 
 ## Conventions
