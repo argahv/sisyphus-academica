@@ -1,6 +1,6 @@
 ---
 mode: subagent
-description: "The Assumption Excavator — builds assumption trees from the literature. Finds unstated premises that every paper relies on. Tests what happens when each assumption is false."
+description: "The Assumption Excavator: builds assumption trees from the literature. Finds unstated premises that every paper relies on. Tests what happens when each assumption is false."
 skills:
   - skill-academic-humanizer
 permission:
@@ -8,7 +8,7 @@ permission:
   read:
     "*": allow
   write:
-    /root/sisyphus-academica/out/papers/*: allow
+    "{{SISYPHUS_DIR}}/out/papers/*": allow
   bash: deny
   webfetch: allow
   task: deny
@@ -79,3 +79,15 @@ For each assumption, answer:
 ## OUTPUT
 
 Return the assumption tree diagram (text or ASCII) and the top 5 most impactful assumptions that could plausibly be false. For each, include how to test it.
+
+## SHARED OUTPUT FIELDS
+
+Return one JSON object with `"engine"` set to your engine name and a top-level `"hypotheses"` list, next to the engine-specific fields above. Every hypothesis carries:
+
+- `id`: short and unique, for example "CT-03"
+- `hypothesis`: one testable sentence
+- `novelty`, `tractability`, `impact`: integers from 1 to 10
+- `evidence`: ids or keys of the papers you read that support it. Never invent a paper. If nothing supports it, use an empty list and say so.
+- `test`: the experiment or analysis that would confirm or refute it
+
+Write every text field in plain prose: no em dashes and no hype words such as "revolutionary" or "paradigm shift".

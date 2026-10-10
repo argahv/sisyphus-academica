@@ -1,414 +1,244 @@
 #!/bin/bash
-# Sisyphus Academica — Interactive Installer
-# Installs 25 agents into OpenCode with portable paths, prompts for config
+# Sisyphus Academica: interactive installer
+# Installs the sisyphus CLI and the 25 OpenCode agents, writes .env, builds the voice profile.
 #
-# Usage: bash install.sh [--yes] [--dev] [--latex] [--check]
-#   --yes     Skip all prompts, use defaults
-#   --dev     Install Python dev dependencies
-#   --latex   Verify LaTeX availability
-#   --check   Validate installation
+# Usage: bash install.sh [--yes] [--dev] [--check]
+#   --yes     Skip all prompts, use defaults (CLI-only when OpenCode is missing)
+#   --dev     Also pip-install test and analysis dependencies
+#   --check   Only validate an existing installation
 
 set -euo pipefail
 
 SISYPHUS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-OPENCODE_AGENTS="${OPENCODE_AGENTS:-$HOME/.config/opencode/agents}"
-OPENCODE_SKILLS="${OPENCODE_SKILLS:-$HOME/.config/opencode/skills}"
 OPENCODE_CONFIG="${OPENCODE_CONFIG:-$HOME/.config/opencode}"
+OPENCODE_AGENTS="${OPENCODE_AGENTS:-$OPENCODE_CONFIG/agents}"
+OPENCODE_SKILLS="${OPENCODE_SKILLS:-$OPENCODE_CONFIG/skills}"
+BIN_DIR="${SISYPHUS_BIN_DIR:-$HOME/.local/bin}"
+S="$SISYPHUS_DIR/bin/sisyphus"
 
 SKIP_PROMPTS=false
-for arg in "$@"; do [ "$arg" = "--yes" ] && SKIP_PROMPTS=true && break; done
+DEV=false
+CHECK_ONLY=false
+for arg in "$@"; do
+    case "$arg" in
+        --yes) SKIP_PROMPTS=true ;;
+        --dev) DEV=true ;;
+        --check) CHECK_ONLY=true ;;
+        *) echo "Unknown option: $arg"; exit 2 ;;
+    esac
+done
 
-echo "╔═══════════════════════════════════════════════════╗"
-echo "║     Sisyphus Academica — Interactive Installer    ║"
-echo "╚═══════════════════════════════════════════════════╝"
-echo ""
-
-# ------------------------------------------------------------------
-# Helper: ask a question (free-form answer)
-# ------------------------------------------------------------------
 ask() {
-    local var_name="$1" prompt="$2" default="${3:-}"
-    if [ "$SKIP_PROMPTS" = true ]; then
-        eval "$var_name=\"$default\""
-        return
+    local var_name="$1" prompt="$2" default="${3:-}" input=""
+    if [ "$SKIP_PROMPTS" = false ]; then
+        local hint=""
+        [ -n "$default" ] && hint=" [$default]"
+        read -r -p "$prompt$hint: " input || true
     fi
-    local hint=""
-    [ -n "$default" ] && hint=" [$default]"
-    read -r -p "$prompt$hint: " input
-    eval "$var_name=\"${input:-$default}\""
+    printf -v "$var_name" '%s' "${input:-$default}"
 }
 
-# ------------------------------------------------------------------
-# Helper: yes/no confirmation
-# ------------------------------------------------------------------
 confirm() {
-    local prompt="$1" default="${2:-y}"
+    local prompt="$1" default="${2:-y}" answer=""
     if [ "$SKIP_PROMPTS" = true ]; then
-        [ "$default" = "y" ] && return 0 || return 1
+        [ "$default" = "y" ]
+        return
     fi
     local hint="[Y/n]"
     [ "$default" = "n" ] && hint="[y/N]"
-    read -r -p "$prompt $hint " answer
+    read -r -p "$prompt $hint " answer || true
     case "${answer:-$default}" in
         [yY]|[yY][eE][sS]) return 0 ;;
         *) return 1 ;;
     esac
 }
 
-# ==================================================================
-# PHASE 0: SUBSCRIPTION INTERVIEW (omo-style)
-# ==================================================================
-echo "[0/7] Subscription interview..."
+validate() {
+    local errors=0
+    echo "Validating installation..."
+    if python3 -c 'import sys; sys.exit(sys.version_info < (3, 10))' 2>/dev/null; then
+        echo "  ✓ Python $(python3 -c 'import platform; print(platform.python_version())')"
+    else
+        echo "  ✗ Python 3.10+ is required"; errors=$((errors + 1))
+    fi
+    if "$S" --help >/dev/null 2>&1; then
+        echo "  ✓ sisyphus CLI runs ($S)"
+    else
+        echo "  ✗ sisyphus CLI failed to start"; errors=$((errors + 1))
+    fi
+    command -v sisyphus >/dev/null 2>&1 && echo "  ✓ sisyphus on PATH" \
+        || echo "  ⚠ sisyphus not on PATH (add $BIN_DIR to PATH, or use $S)"
+    if command -v opencode >/dev/null 2>&1 || [ -d "$OPENCODE_AGENTS" ]; then
+        if python3 "$SISYPHUS_DIR/tools/agents.py" --check --dest "$OPENCODE_AGENTS"; then :; else errors=$((errors + 1)); fi
+    else
+        echo "  - OpenCode agents not installed (CLI-only mode)"
+    fi
+    [ -f "$SISYPHUS_DIR/.env" ] && echo "  ✓ .env present" || echo "  ⚠ .env missing: run $S configure"
+    if command -v latexmk >/dev/null 2>&1 || command -v pdflatex >/dev/null 2>&1; then
+        echo "  ✓ LaTeX found"
+    else
+        echo "  ⚠ LaTeX not found: papers stop at .tex (or use: sisyphus build RUN --docker)"
+    fi
+    [ "$errors" -eq 0 ] && echo "  ✓ Validation passed" || echo "  ✗ $errors problem(s)"
+    return "$errors"
+}
+
+if [ "$CHECK_ONLY" = true ]; then
+    validate
+    exit $?
+fi
+
+echo "Sisyphus Academica installer"
 echo ""
 
-# Q0: Author name
-ask AUTHOR_NAME "What is your name?" "${USER:-argahv}"
+# ------------------------------------------------------------------ interview
+echo "[0/6] Setup questions"
+python3 -c 'import sys; sys.exit(sys.version_info < (3, 10))' 2>/dev/null \
+    || { echo "  ✗ Python 3.10+ is required (found: $(python3 --version 2>&1))"; exit 1; }
 
-# Write name to CITATION.cff
+ask AUTHOR_NAME "  Your name (for CITATION.cff and paper bylines)" "${USER:-anonymous}"
 if grep -q 'given-names: ""' "$SISYPHUS_DIR/CITATION.cff" 2>/dev/null; then
     FAMILY="${AUTHOR_NAME##* }"
     GIVEN="${AUTHOR_NAME% *}"
-    [ -z "$GIVEN" ] && GIVEN="$FAMILY" && FAMILY=""
-    [ -z "$FAMILY" ] && FAMILY="$GIVEN" && GIVEN=""
-    sed -i "s/family-names: \".*\"/family-names: \"$FAMILY\"/" "$SISYPHUS_DIR/CITATION.cff"
-    sed -i "s/given-names: \".*\"/given-names: \"$GIVEN\"/" "$SISYPHUS_DIR/CITATION.cff"
-    echo "  ✓ CITATION.cff updated with name: $GIVEN $FAMILY"
+    [ "$GIVEN" = "$AUTHOR_NAME" ] && GIVEN=""
+    python3 - "$SISYPHUS_DIR/CITATION.cff" "$FAMILY" "$GIVEN" <<'PY'
+import re, sys
+path, family, given = sys.argv[1:4]
+text = open(path, encoding="utf-8").read()
+text = re.sub(r'family-names: ".*"', f'family-names: "{family}"', text, count=1)
+text = re.sub(r'given-names: ".*"', f'given-names: "{given}"', text, count=1)
+open(path, "w", encoding="utf-8").write(text)
+PY
+    echo "  ✓ CITATION.cff updated"
 fi
 
-# Q1: Platform — OpenCode or manual
+PLATFORM="opencode"
 if command -v opencode &>/dev/null; then
-    echo "  ✓ OpenCode $(opencode --version 2>/dev/null | head -1) detected"
-    HAS_OPENCODE=true
-    PLATFORM="opencode"
+    echo "  ✓ OpenCode detected: $(opencode --version 2>/dev/null | head -1)"
 else
-    echo "  ⚠ OpenCode not found (install from https://opencode.ai/docs)"
-    HAS_OPENCODE=false
-    if confirm "  Continue without OpenCode? (CLI tools only, no agent orchestration)" "n"; then
+    echo "  ⚠ OpenCode not found (https://opencode.ai/docs). Without it you get the CLI tools only."
+    if confirm "  Continue with the CLI tools only?" "y"; then
         PLATFORM="manual"
-        echo "  → Manual mode: Python CLI tools only"
     else
-        echo "  → Install OpenCode first, then re-run: bash install.sh"
-        echo "  → Ref: https://opencode.ai/docs"
+        echo "  → Install OpenCode, then re-run: bash install.sh"
         exit 0
     fi
 fi
 
-# Q2: oh-my-openagent integration
+DEFAULT_MODEL=""
 if [ "$PLATFORM" = "opencode" ]; then
-    if [ -f "$OPENCODE_CONFIG/oh-my-openagent.json" ] || [ -f "$OPENCODE_CONFIG/oh-my-openagent.jsonc" ]; then
-        echo "  ✓ oh-my-openagent detected — agents integrate into omo ecosystem"
-        HAS_OMO=true
-    else
-        HAS_OMO=false
-        if confirm "  Do you have oh-my-openagent installed? (for omo integration)" "n"; then
-            echo "  → Install oh-my-openagent first: bunx oh-my-openagent install"
-            echo "  → Then re-run: bash install.sh"
-            echo "  → Continuing with standalone config for now"
-        fi
+    if [ ! -f "$OPENCODE_CONFIG/oh-my-openagent.json" ] && [ ! -f "$OPENCODE_CONFIG/oh-my-openagent.jsonc" ]; then
+        echo "  - oh-my-openagent not detected (optional; agents work in plain OpenCode)"
     fi
-fi
-
-# Q3: Claude subscription (like omo's --claude flag)
-echo ""
-echo "  ── LLM Subscriptions ──"
-
-HAS_CLAUDE=false
-CLAUDE_MAX20=false
-if confirm "  Do you have a Claude subscription (Pro/Max)?" "n"; then
-    HAS_CLAUDE=true
-    if confirm "  Do you have Claude Max (20x usage)?" "n"; then
-        CLAUDE_MAX20=true
-    fi
-fi
-
-# Strong warning when no Claude (like omo's "MUST STRONGLY WARN")
-if [ "$HAS_CLAUDE" = false ]; then
     echo ""
-    echo "  ⚠ WARNING: Sisyphus Academica's writing and novelty engines work best"
-    echo "    with Claude models. Without a Claude subscription, paper quality may"
-    echo "    noticeably degrade. GPT models and free-tier alternatives will"
-    echo "    require 2-3x more revision rounds to match Claude output."
-    echo ""
-fi
-
-# Q4: OpenAI subscription (like omo's --openai flag)
-HAS_OPENAI=false
-if confirm "  Do you have an OpenAI/ChatGPT subscription?" "n"; then
-    HAS_OPENAI=true
-fi
-
-# Derive combined provider
-if [ "$HAS_CLAUDE" = true ] && [ "$HAS_OPENAI" = true ]; then
-    LLM_PROVIDER="both"
-elif [ "$HAS_CLAUDE" = true ]; then
-    LLM_PROVIDER="anthropic"
-elif [ "$HAS_OPENAI" = true ]; then
-    LLM_PROVIDER="openai"
-else
-    LLM_PROVIDER="9router"
-fi
-
-# Q5: Semantic Scholar API key (like omo's --opencode-zen style flag)
-echo ""
-echo "  ── API Keys ──"
-
-ask SEMANTIC_SCHOLAR_KEY "  Semantic Scholar API key? (free — get at semanticscholar.org/product/api)" ""
-if [ -n "$SEMANTIC_SCHOLAR_KEY" ]; then
-    if [ -f "$SISYPHUS_DIR/.env" ]; then
-        if grep -q 'SEMANTIC_SCHOLAR_API_KEY=' "$SISYPHUS_DIR/.env"; then
-            sed -i "s/SEMANTIC_SCHOLAR_API_KEY=.*/SEMANTIC_SCHOLAR_API_KEY=$SEMANTIC_SCHOLAR_KEY/" "$SISYPHUS_DIR/.env"
-        else
-            echo "SEMANTIC_SCHOLAR_API_KEY=$SEMANTIC_SCHOLAR_KEY" >> "$SISYPHUS_DIR/.env"
-        fi
+    echo "  LLM provider (agents use provider/model strings from config/agent-config.json)"
+    HAS_CLAUDE=false
+    HAS_OPENAI=false
+    confirm "  Do you use Anthropic (Claude) models?" "n" && HAS_CLAUDE=true
+    confirm "  Do you use OpenAI models?" "n" && HAS_OPENAI=true
+    if [ "$HAS_CLAUDE" = true ]; then
+        DEFAULT_MODEL="anthropic/claude-sonnet-4"
+    elif [ "$HAS_OPENAI" = true ]; then
+        DEFAULT_MODEL="openai/gpt-4o"
+        echo "  ⚠ The writer and novelty engines were tuned on Claude; expect more revision rounds."
     else
-        cp "$SISYPHUS_DIR/.env.example" "$SISYPHUS_DIR/.env"
-        sed -i "s/SEMANTIC_SCHOLAR_API_KEY=.*/SEMANTIC_SCHOLAR_API_KEY=$SEMANTIC_SCHOLAR_KEY/" "$SISYPHUS_DIR/.env"
-    fi
-    echo "  ✓ API key saved to .env"
-else
-    echo "  → Skipping (100 req/min rate limit applies)"
-fi
-
-# Q6: Voice sample
-echo ""
-echo "  ── Voice Calibration ──"
-HAS_VOICE_SAMPLE=false
-if [ -f "$SISYPHUS_DIR/data/voice-profile/sample.txt" ]; then
-    if confirm "  Voice sample found. Use existing?" "y"; then
-        HAS_VOICE_SAMPLE=true
-    fi
-else
-    if confirm "  Do you have a writing sample for voice calibration?" "n"; then
-        HAS_VOICE_SAMPLE=true
-        echo "  → Paste 2-3 paragraphs of published writing into:"
-        echo "    $SISYPHUS_DIR/data/voice-profile/sample.txt"
+        echo "  → Keeping default_model from config/agent-config.json"
     fi
 fi
 
-# Q7: LaTeX
 echo ""
-echo "  ── LaTeX / PDF ──"
-if command -v pdflatex &>/dev/null; then
-    echo "  ✓ LaTeX detected: $(pdflatex --version 2>/dev/null | head -1)"
+ask SEMANTIC_SCHOLAR_KEY "  Semantic Scholar API key (free, semanticscholar.org/product/api; enter to skip)" ""
+ask CROSSREF_EMAIL "  Email for the CrossRef/OpenAlex polite pool (enter to skip)" ""
+
+HAS_LATEX=false
+if command -v latexmk &>/dev/null || command -v pdflatex &>/dev/null; then
     HAS_LATEX=true
+    echo "  ✓ LaTeX detected"
 elif command -v docker &>/dev/null; then
-    echo "  ⚠ LaTeX not installed locally. Docker available."
-    if confirm "  Use Docker for LaTeX compilation?" "y"; then
-        HAS_LATEX=true
-    else
-        HAS_LATEX=false
-    fi
+    echo "  ⚠ LaTeX not installed; Docker found. Build PDFs with: sisyphus build RUN --docker"
 else
-    echo "  ⚠ LaTeX not found. Papers will output .tex only."
-    HAS_LATEX=false
+    echo "  ⚠ LaTeX not found. Papers will stop at .tex (install TeX Live for PDFs)."
 fi
 
-# ==================================================================
-# SUMMARY
-# ==================================================================
 echo ""
-echo "  ── Install Plan ──"
-echo "  Name:     $AUTHOR_NAME"
-echo "  Platform: ${PLATFORM:-opencode}"
-echo "  Claude:   $([ "$HAS_CLAUDE" = true ] && echo "yes $([ "$CLAUDE_MAX20" = true ] && echo '(max20)')" || echo "no")"
-echo "  OpenAI:   $([ "$HAS_OPENAI" = true ] && echo yes || echo no)"
-echo "  Provider: $LLM_PROVIDER"
-echo "  LaTeX:    $([ "$HAS_LATEX" = true ] && echo yes || echo no)"
-echo "  Voice:    $([ "$HAS_VOICE_SAMPLE" = true ] && echo yes || echo no)"
-
-if ! confirm "  Proceed with installation?" "y"; then
+echo "  Plan: platform=$PLATFORM  model=${DEFAULT_MODEL:-config default}  latex=$HAS_LATEX"
+if ! confirm "  Proceed?" "y"; then
     echo "  → Aborted."
     exit 0
 fi
 echo ""
 
-# ==================================================================
-# INSTALL AGENT FILE with portable path transformation
-# ==================================================================
-install_agent_file() {
-    local src="$1"
-    local basename="$(basename "$src")"
-    local dest="$OPENCODE_AGENTS/$basename"
-    if [ ! -f "$src" ]; then
-        echo "  ⚠ Missing source: $src"
-        return 1
-    fi
-    mkdir -p "$OPENCODE_AGENTS"
-    sed \
-        -e "s|/root/sisyphus-academica|$SISYPHUS_DIR|g" \
-        -e "s|/root/\.config/opencode|$OPENCODE_CONFIG|g" \
-        -e "s|/root/\.local/share/opencode|$HOME/.local/share/opencode|g" \
-        -e "s|/tmp/opencode|/tmp/opencode|g" \
-        "$src" > "$dest"
-    echo "  ✓ $basename"
-}
-
-# ==================================================================
-# Transform config/agent-config.json
-# ==================================================================
-install_config() {
-    local src="$SISYPHUS_DIR/config/agent-config.json"
-    local dest="$OPENCODE_AGENTS/../agent-config.json"
-    if [ ! -f "$src" ]; then
-        echo "  ⚠ Missing config: $src"
-        return
-    fi
-    mkdir -p "$OPENCODE_CONFIG"
-    sed \
-        -e "s|/root/sisyphus-academica|$SISYPHUS_DIR|g" \
-        -e "s|/root/\.config/opencode|$OPENCODE_CONFIG|g" \
-        -e "s|/root/\.local/share/opencode|$HOME/.local/share/opencode|g" \
-        "$src" > "$dest"
-    echo "  ✓ agent-config.json → $dest"
-}
-
-# ==================================================================
-# Configure models based on subscription answers
-# ==================================================================
-configure_models() {
-    local config_file="$OPENCODE_CONFIG/agent-config.json"
-    [ ! -f "$config_file" ] && return
-
-    case "$LLM_PROVIDER" in
-        anthropic)
-            sed -i 's|"model": "9router/opencode-free"|"model": "anthropic/claude-sonnet-4"|g' "$config_file"
-            if [ "$CLAUDE_MAX20" = true ]; then
-                sed -i 's|"variant": "think"|"variant": "think"|' "$config_file"
-                echo "  → Claude Max20: all agents set to Claude Sonnet 4 (unlimited)"
-            else
-                echo "  → All agents set to Claude Sonnet 4"
-            fi
-            ;;
-        openai)
-            sed -i 's|"model": "9router/opencode-free"|"model": "openai/gpt-4o"|g' "$config_file"
-            echo "  → All agents set to GPT-4o"
-            echo "  ⚠ Note: Novelty engines and writer perform better with Claude."
-            echo "    Edit config/agent-config.json to use Claude for those agents."
-            ;;
-        both)
-            sed -i 's|"model": "9router/opencode-free"|"model": "anthropic/claude-sonnet-4"|g' "$config_file"
-            echo "  → Writers, novelty engines, reviewers → Claude Sonnet 4"
-            echo "  → Edit config/agent-config.json to set verifier/literature-scout to openai/gpt-4o"
-            ;;
-        9router)
-            echo "  → Using default 9router gateway (no change needed)"
-            ;;
-    esac
-}
-
-# ==================================================================
-# [1/7] Install Humanizer skill
-# ==================================================================
-echo "[1/7] Installing Humanizer skill..."
-if [ ! -f "$OPENCODE_SKILLS/humanizer/SKILL.md" ]; then
-    mkdir -p "$OPENCODE_SKILLS"
-    if command -v git &>/dev/null; then
-        git clone https://github.com/blader/humanizer.git "$OPENCODE_SKILLS/humanizer" 2>/dev/null || {
-            echo "  ⚠ Could not clone humanizer. Install manually:"
-            echo "    git clone https://github.com/blader/humanizer.git \$OPENCODE_SKILLS/humanizer"
-        }
-    else
-        echo "  ⚠ git not found."
-    fi
-    echo "  ✓ Humanizer installed"
-else
-    echo "  ✓ Humanizer already exists"
+# ------------------------------------------------------------------ CLI
+echo "[1/6] sisyphus CLI"
+mkdir -p "$BIN_DIR"
+cat > "$BIN_DIR/sisyphus" <<EOF
+#!/bin/sh
+exec "$S" "\$@"
+EOF
+chmod +x "$BIN_DIR/sisyphus" "$S"
+echo "  ✓ $BIN_DIR/sisyphus -> $S"
+case ":$PATH:" in *":$BIN_DIR:"*) ;; *) echo "  ⚠ Add $BIN_DIR to PATH to call 'sisyphus' directly" ;; esac
+if [ "$DEV" = true ]; then
+    python3 -m pip install -e "$SISYPHUS_DIR[dev,analysis]" \
+        || echo "  ⚠ pip install failed; try a virtualenv: python3 -m venv .venv && .venv/bin/pip install -e '.[dev]'"
 fi
 
-# ==================================================================
-# [2/7] Install academic-humanizer skill
-# ==================================================================
-echo "[2/7] Installing academic-humanizer skill..."
-mkdir -p "$OPENCODE_SKILLS/skill-academic-humanizer"
-cp "$SISYPHUS_DIR/skills/skill-academic-humanizer.md" "$OPENCODE_SKILLS/skill-academic-humanizer/SKILL.md" 2>/dev/null || \
-    echo "  ⚠ Could not copy academic-humanizer"
-echo "  ✓ Academic Humanizer installed"
+# ------------------------------------------------------------------ .env
+echo "[2/6] Configuration"
+CONFIGURE_ARGS=()
+[ -n "$SEMANTIC_SCHOLAR_KEY" ] && CONFIGURE_ARGS+=(--semantic-scholar-key "$SEMANTIC_SCHOLAR_KEY")
+[ -n "$CROSSREF_EMAIL" ] && CONFIGURE_ARGS+=(--crossref-email "$CROSSREF_EMAIL")
+"$S" configure ${CONFIGURE_ARGS[@]+"${CONFIGURE_ARGS[@]}"} </dev/null | sed 's/^/  /'
 
-# ==================================================================
-# [3/7] Install orchestrator agents (25 total)
-# ==================================================================
-echo "[3/7] Installing orchestrator agents (25 total)..."
-install_agent_file "$SISYPHUS_DIR/orchestrator/research-director.md"
-for f in "$SISYPHUS_DIR/subagents/"*.md; do install_agent_file "$f"; done
-for f in "$SISYPHUS_DIR/novelty-engines/"*.md; do install_agent_file "$f"; done
-for f in "$SISYPHUS_DIR/reviewers/"*.md; do install_agent_file "$f"; done
-echo "  → All agents installed in $OPENCODE_AGENTS"
-
-# ==================================================================
-# [4/7] Install config with path transformation
-# ==================================================================
-echo "[4/7] Installing agent configuration..."
-install_config
-configure_models
-
-# ==================================================================
-# [5/7] Set up directories and tools
-# ==================================================================
-echo "[5/7] Setting up directories..."
-chmod +x "$SISYPHUS_DIR/tools/"*.py 2>/dev/null || true
-mkdir -p "$SISYPHUS_DIR/data" "$SISYPHUS_DIR/out/papers" "$SISYPHUS_DIR/out/figures"
-
-if echo "$@" | grep -q -- "--dev"; then
-    echo ""
-    echo "[Optional] Installing Python dependencies..."
-    if command -v pip3 &>/dev/null; then
-        pip3 install -r "$SISYPHUS_DIR/requirements.txt" 2>/dev/null || \
-            echo "  ⚠ pip install failed (try: pip install -r requirements.txt)"
-    else
-        echo "  ⚠ pip3 not found."
-    fi
-fi
-
-# ==================================================================
-# [6/7] Provider authentication guide
-# ==================================================================
-echo "[6/7] Provider authentication..."
+# ------------------------------------------------------------------ skills
+echo "[3/6] Writing skills"
 if [ "$PLATFORM" = "opencode" ]; then
-    if [ "$HAS_CLAUDE" = true ]; then
-        echo "  → Run 'opencode auth login' to authenticate Anthropic (Claude)"
+    mkdir -p "$OPENCODE_SKILLS/skill-academic-humanizer"
+    cp "$SISYPHUS_DIR/skills/skill-academic-humanizer/SKILL.md" "$OPENCODE_SKILLS/skill-academic-humanizer/SKILL.md"
+    echo "  ✓ skill-academic-humanizer (patterns 31-41)"
+    if [ -f "$OPENCODE_SKILLS/humanizer/SKILL.md" ]; then
+        echo "  ✓ humanizer already installed (patterns 1-30)"
+    elif command -v git &>/dev/null && git clone --depth 1 https://github.com/blader/humanizer.git \
+            "$OPENCODE_SKILLS/humanizer" >/dev/null 2>&1; then
+        echo "  ✓ humanizer (patterns 1-30) from github.com/blader/humanizer"
+    else
+        echo "  ⚠ Could not clone blader/humanizer. The gates still check all 41 patterns in code;"
+        echo "    writers lose the skill's examples. Retry: git clone https://github.com/blader/humanizer.git $OPENCODE_SKILLS/humanizer"
     fi
-    if [ "$HAS_OPENAI" = true ]; then
-        echo "  → Run 'opencode auth login' to authenticate OpenAI (GPT)"
-    fi
-    if [ "$LLM_PROVIDER" = "9router" ]; then
-        echo "  → Using 9router — no auth needed (gateway handles it)"
-    fi
+else
+    echo "  - skipped (no OpenCode)"
 fi
 
-# ==================================================================
-# [7/7] Validation
-# ==================================================================
-echo "[7/7] Validating installation..."
-errors=0
-expected=25
-count=0
-for f in "$SISYPHUS_DIR/orchestrator/"*.md "$SISYPHUS_DIR/subagents/"*.md \
-         "$SISYPHUS_DIR/novelty-engines/"*.md "$SISYPHUS_DIR/reviewers/"*.md; do
-    base=$(basename "$f")
-    [ -f "$OPENCODE_AGENTS/$base" ] && count=$((count + 1))
-done
+# ------------------------------------------------------------------ agents
+echo "[4/6] Agents"
+if [ "$PLATFORM" = "opencode" ]; then
+    AGENT_ARGS=(--dest "$OPENCODE_AGENTS" --opencode-config "$OPENCODE_CONFIG")
+    [ -n "$DEFAULT_MODEL" ] && AGENT_ARGS+=(--default-model "$DEFAULT_MODEL")
+    python3 "$SISYPHUS_DIR/tools/agents.py" "${AGENT_ARGS[@]}"
+    echo "  → Models come from config/agent-config.json; edit it and re-run install.sh to change them."
+else
+    echo "  - skipped (no OpenCode)"
+fi
 
-echo "  Agents installed: $count / $expected"
-[ "$count" -ge "$expected" ] && echo "  ✓ All agents present" || { echo "  ⚠ Missing agents"; errors=$((errors + 1)); }
+# ------------------------------------------------------------------ voice
+echo "[5/6] Voice calibration"
+if ls "$SISYPHUS_DIR"/data/voice-profile/*.txt >/dev/null 2>&1; then
+    "$S" voice | sed 's/^/  /' || echo "  ⚠ Voice samples too short; add 2-3 paragraphs and run: sisyphus voice"
+else
+    echo "  - No samples. Optional: put 2-3 paragraphs of your published writing in"
+    echo "    $SISYPHUS_DIR/data/voice-profile/sample.txt and run: sisyphus voice"
+fi
 
-[ -f "$OPENCODE_CONFIG/agent-config.json" ] && echo "  ✓ Configuration installed" || { echo "  ⚠ Configuration missing"; errors=$((errors + 1)); }
-[ -f "$SISYPHUS_DIR/.env" ] && echo "  ✓ .env configured" || echo "  ⚠ .env not configured — cp .env.example .env"
+# ------------------------------------------------------------------ check
+echo "[6/6] Validation"
+validate || true
 
 echo ""
-[ "$errors" -eq 0 ] && echo "  ✓ Validation PASSED" || echo "  ⚠ $errors issue(s) found"
-
-echo ""
-echo "╔═══════════════════════════════════════════════════╗"
-echo "║     Sisyphus Academica — INSTALLED                ║"
-echo "╚═══════════════════════════════════════════════════╝"
-echo ""
-echo "  Profile:   $AUTHOR_NAME"
-echo "  Provider:  $LLM_PROVIDER"
-echo "  Agents:    25"
-echo "  LaTeX:     $([ "$HAS_LATEX" = true ] && echo yes || echo no)"
-echo ""
-echo "  Next:"
-echo "  1. OpenCode → agent tab → research-director"
-echo "  2. Type: \"write a paper about [topic]\""
-echo ""
-echo "  Docs: https://github.com/argahv/sisyphus-academica"
+echo "Done."
+echo "  Try the gates offline:  sisyphus demo"
+if [ "$PLATFORM" = "opencode" ]; then
+    echo "  Write a paper:          OpenCode → agent tab → research-director → \"write a paper about [topic]\""
+    if [ "${HAS_CLAUDE:-false}" = true ] || [ "${HAS_OPENAI:-false}" = true ]; then
+        echo "  Authenticate providers: opencode auth login"
+    fi
+fi

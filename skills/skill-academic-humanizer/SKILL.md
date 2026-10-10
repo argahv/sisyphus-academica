@@ -14,7 +14,7 @@ allowed-tools:
   - Grep
 ---
 
-# Academic Humanizer — Research Paper AI Pattern Detection
+# Academic Humanizer: Research Paper AI Pattern Detection
 
 This skill extends the base Humanizer (30 patterns) with 11 academic-specific patterns. Use in combination with the base Humanizer for 41 total patterns.
 

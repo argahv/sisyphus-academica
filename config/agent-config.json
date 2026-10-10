@@ -1,285 +1,164 @@
 {
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json",
+  "default_model": "9router/opencode-free",
   "agents": {
     "research-director": {
       "model": "9router/opencode-free",
       "variant": "think",
-      "description": "Sisyphus Academica — autonomous research paper writing army conductor. Deploys 7+ specialized subagents including 6 novelty engines and 10 adversarial reviewers.",
-      "skills": [
-        "skill-academic-humanizer"
-      ],
+      "description": "Sisyphus Academica Research Director. Runs the paper pipeline: literature search, six novelty engines, methodology, analysis, parallel writing, five code-enforced quality gates, ten adversarial reviewers, style audit and LaTeX/PDF formatting.",
       "fallback_models": [
-        { "model": "9router/opencode-free", "variant": "think" },
-        { "model": "9router/opencode-free" },
-        { "model": "9router/primary" },
-        { "model": "9router/fast" }
-      ],
-      "permission": {
-        "bash": "allow",
-        "webfetch": "allow",
-        "task": "allow",
-        "read": "allow",
-        "write": "allow",
-        "edit": "deny",
-        "doom_loop": "ask",
-        "external_directory": {
-          "/root/sisyphus-academica/*": "allow",
-          "/root/.config/opencode/skills/humanizer/*": "allow",
-          "/tmp/opencode/*": "allow"
+        {
+          "model": "9router/opencode-free",
+          "variant": "think"
+        },
+        {
+          "model": "9router/opencode-free"
+        },
+        {
+          "model": "9router/primary"
+        },
+        {
+          "model": "9router/fast"
         }
-      }
+      ]
     },
-    "literature-scout": {
+    "data-engineer": {
       "model": "9router/opencode-free",
       "variant": "fast",
-      "description": "Multi-source literature search — arXiv, Semantic Scholar, CrossRef, OpenAlex",
-      "skills": [],
-      "fallback_models": [
-        { "model": "9router/opencode-free", "variant": "fast" },
-        { "model": "9router/fast" }
-      ],
-      "permission": {
-        "bash": "allow",
-        "webfetch": "allow",
-        "read": "allow",
-        "write": { "/root/sisyphus-academica/out/papers/*": "allow" },
-        "edit": "deny",
-        "task": "deny"
-      }
-    },
-    "writer": {
-      "model": "9router/opencode-free",
-      "variant": "think",
-      "description": "Paper section writer with 41 Humanizer patterns as hard generation constraints",
-      "skills": ["humanizer", "skill-academic-humanizer"],
-      "fallback_models": [
-        { "model": "9router/opencode-free", "variant": "think" },
-        { "model": "9router/primary" }
-      ],
-      "permission": {
-        "read": "allow",
-        "write": { "/root/sisyphus-academica/out/papers/*": "allow" },
-        "webfetch": "allow",
-        "bash": "deny",
-        "edit": "deny",
-        "task": "deny"
-      }
-    },
-    "verifier": {
-      "model": "9router/opencode-free",
-      "variant": "think",
-      "description": "3-module verification — citation accuracy, statistical validity, AI-pattern detection",
-      "skills": ["humanizer", "skill-academic-humanizer"],
-      "permission": {
-        "read": "allow",
-        "write": { "/root/sisyphus-academica/out/papers/*": "allow" },
-        "bash": "allow",
-        "webfetch": "allow",
-        "edit": "deny",
-        "task": "deny"
-      }
-    },
-    "style-auditor": {
-      "model": "9router/opencode-free",
-      "variant": "think",
-      "description": "Final Humanizer certification gate — 41 pattern scan, em dash zero, voice consistency",
-      "skills": ["humanizer", "skill-academic-humanizer"],
-      "permission": {
-        "read": "allow",
-        "write": { "/root/sisyphus-academica/out/papers/*": "allow" },
-        "bash": "deny",
-        "webfetch": "allow",
-        "edit": "deny",
-        "task": "deny"
-      }
+      "description": "Data engineer. Writes and runs the analysis code, produces statistics.json (the only allowed source of numbers in the paper) and publication-quality vector figures."
     },
     "formatter": {
       "model": "9router/opencode-free",
       "variant": "fast",
-      "description": "LaTeX template formatting, BibTeX, figure embedding, PDF compilation",
-      "skills": [],
-      "permission": {
-        "bash": "allow",
-        "read": "allow",
-        "write": { "/root/sisyphus-academica/*": "allow" },
-        "webfetch": "allow",
-        "edit": "deny",
-        "task": "deny"
-      }
+      "description": "Formatter: builds the venue LaTeX, writes BibTeX from verified references only, embeds figures and compiles the PDF with sisyphus build. Refuses to run unless all five quality gates passed on the current draft."
     },
-    "heretic": {
+    "gap-analyzer": {
       "model": "9router/opencode-free",
       "variant": "think",
-      "description": "Crown jewel novelty engine. Generates 50 wild hypotheses from title+abstract, then scores against actual paper.",
-      "skills": ["skill-academic-humanizer"],
-      "permission": {
-        "read": "allow",
-        "write": { "/root/sisyphus-academica/out/papers/*": "allow" },
-        "bash": "deny",
-        "webfetch": "allow",
-        "edit": "deny",
-        "task": "deny"
-      }
+      "description": "Gap analyzer. Finds genuine, testable research gaps in the literature corpus: contradictions, untested predictions, unexamined populations and methods. Not future-work filler."
     },
-    "contrarian": {
+    "literature-scout": {
+      "model": "9router/opencode-free",
+      "variant": "fast",
+      "description": "Literature scout. Searches arXiv, Semantic Scholar, CrossRef and OpenAlex in parallel for one facet of the topic and records the claims, methods, results and limitations of the most relevant papers.",
+      "fallback_models": [
+        {
+          "model": "9router/opencode-free",
+          "variant": "fast"
+        },
+        {
+          "model": "9router/fast"
+        }
+      ]
+    },
+    "methodology-designer": {
       "model": "9router/opencode-free",
       "variant": "think",
-      "description": "Novelty engine — inverts well-established field claims",
-      "skills": ["skill-academic-humanizer"],
-      "permission": {
-        "read": "allow",
-        "write": { "/root/sisyphus-academica/out/papers/*": "allow" },
-        "bash": "deny",
-        "webfetch": "allow",
-        "edit": "deny",
-        "task": "deny"
-      }
+      "description": "Methodology designer. Turns the selected hypothesis into a reproducible study: test selection, power analysis, confound control and a pre-specified analysis plan that the statistics gate later checks against."
     },
-    "cross-pollinator": {
+    "style-auditor": {
       "model": "9router/opencode-free",
       "variant": "think",
-      "description": "Novelty engine — imports solutions from distant fields",
-      "skills": [],
-      "permission": {
-        "read": "allow",
-        "write": { "/root/sisyphus-academica/out/papers/*": "allow" },
-        "bash": "deny",
-        "webfetch": "allow",
-        "edit": "deny",
-        "task": "deny"
-      }
+      "description": "Final style certification. Runs the code-enforced style gate (zero em dashes, under 1 AI pattern per 2000 words, voice within the author's profile) and annotates what a careful human reader would still flag."
+    },
+    "verifier": {
+      "model": "9router/opencode-free",
+      "variant": "think",
+      "description": "Verification gate: runs the code-enforced citation, statistics and AI-pattern checks, then checks what code cannot (does each cited paper support its sentence, does the statistical design fit the claims). All checks must pass before review."
+    },
+    "writer": {
+      "model": "9router/opencode-free",
+      "variant": "think",
+      "description": "Paper section writer. Works from a shared outline, cites only verified references, takes every number from the analysis output, writes in the author's calibrated voice, and treats the 41 Humanizer patterns as hard constraints.",
+      "fallback_models": [
+        {
+          "model": "9router/opencode-free",
+          "variant": "think"
+        },
+        {
+          "model": "9router/primary"
+        }
+      ]
     },
     "assumption-excavator": {
       "model": "9router/opencode-free",
       "variant": "think",
-      "description": "Novelty engine — enumerates and tests unstated assumptions",
-      "skills": ["skill-academic-humanizer"],
-      "permission": {
-        "read": "allow",
-        "write": { "/root/sisyphus-academica/out/papers/*": "allow" },
-        "bash": "deny",
-        "webfetch": "allow",
-        "edit": "deny",
-        "task": "deny"
-      }
+      "description": "The Assumption Excavator: builds assumption trees from the literature. Finds unstated premises that every paper relies on. Tests what happens when each assumption is false."
+    },
+    "contrarian": {
+      "model": "9router/opencode-free",
+      "variant": "think",
+      "description": "The Contrarian: inverts every well-established claim in the literature. Generates 10 counter-hypotheses that challenge fundamental field assumptions."
     },
     "counterfactual-generator": {
       "model": "9router/opencode-free",
       "variant": "think",
-      "description": "Novelty engine — rewrites field history without key papers",
-      "skills": ["skill-academic-humanizer"],
-      "permission": {
-        "read": "allow",
-        "write": { "/root/sisyphus-academica/out/papers/*": "allow" },
-        "bash": "deny",
-        "webfetch": "allow",
-        "edit": "deny",
-        "task": "deny"
-      }
+      "description": "The Counterfactual Generator: rewrites the field's history without the most-cited papers. Traces how methods, benchmarks, and conclusions would differ if key results had gone the other way."
+    },
+    "cross-pollinator": {
+      "model": "9router/opencode-free",
+      "variant": "think",
+      "description": "The Cross-Pollinator: imports solutions from the 15 most distant fields. Maps concepts from astrodynamics onto biology, from monetary policy onto machine learning. Finds analogies no human would see."
+    },
+    "heretic": {
+      "model": "9router/opencode-free",
+      "variant": "think",
+      "description": "The Heretic: crown jewel of the novelty engines. Generates 50 wild hypotheses from title + abstract alone, then scores them against the actual paper. The gap between what the paper IS and what it COULD HAVE BEEN is where the next paper lives."
     },
     "paradox-sifter": {
       "model": "9router/opencode-free",
       "variant": "think",
-      "description": "Novelty engine — finds contradictions everyone ignores",
-      "skills": ["skill-academic-humanizer"],
-      "permission": {
-        "read": "allow",
-        "write": { "/root/sisyphus-academica/out/papers/*": "allow" },
-        "bash": "deny",
-        "webfetch": "allow",
-        "edit": "deny",
-        "task": "deny"
-      }
+      "description": "The Paradox Sifter: cross-references every 'Limitations and Future Work' section across the entire literature. Finds contradictions everyone has noticed but no one has resolved."
     },
-    "theorist": {
+    "competitor": {
       "model": "9router/opencode-free",
       "variant": "think",
-      "description": "Adversarial reviewer — checks formal rigor and proofs",
-      "skills": ["skill-academic-humanizer"],
-      "permission": {
-        "read": "allow",
-        "write": { "/root/sisyphus-academica/out/papers/*": "allow" },
-        "bash": "deny",
-        "webfetch": "allow",
-        "edit": "deny",
-        "task": "deny"
-      }
+      "description": "The Competitor: adversarial reviewer persona. Reviews with deep knowledge of the closest competing work. Catches incremental contributions and unfair comparisons."
+    },
+    "dreamer": {
+      "model": "9router/opencode-free",
+      "variant": "think",
+      "description": "The Dreamer: adversarial reviewer persona. Reviews for untapped potential, moonshots, and where the work could go next."
     },
     "empiricist": {
       "model": "9router/opencode-free",
       "variant": "think",
-      "description": "Adversarial reviewer — checks experimental rigor and baselines",
-      "skills": [],
-      "permission": {
-        "read": "allow",
-        "write": { "/root/sisyphus-academica/out/papers/*": "allow" },
-        "bash": "deny",
-        "webfetch": "allow",
-        "edit": "deny",
-        "task": "deny"
-      }
+      "description": "The Empiricist: adversarial reviewer persona. Reviews paper for experimental rigor, baselines, reproducibility, and code availability."
     },
-    "skeptic": {
-      "model": "9router/opencode-free",
-      "variant": "fast",
-      "description": "Adversarial reviewer — default position: results are wrong",
-      "skills": [],
-      "permission": {
-        "read": "allow",
-        "write": { "/root/sisyphus-academica/out/papers/*": "allow" },
-        "bash": "deny",
-        "webfetch": "allow",
-        "edit": "deny",
-        "task": "deny"
-      }
-    },
-    "methodologist": {
+    "ethicist": {
       "model": "9router/opencode-free",
       "variant": "think",
-      "description": "Adversarial reviewer — checks statistical methodology",
-      "skills": [],
-      "permission": {
-        "read": "allow",
-        "write": { "/root/sisyphus-academica/out/papers/*": "allow" },
-        "bash": "deny",
-        "webfetch": "allow",
-        "edit": "deny",
-        "task": "deny"
-      }
+      "description": "The Ethicist: adversarial reviewer persona. Reviews for societal impact, ethical considerations, bias, dual-use potential, and fairness."
     },
     "historian": {
       "model": "9router/opencode-free",
       "variant": "fast",
-      "description": "Adversarial reviewer — checks prior art and citation accuracy",
-      "skills": [],
-      "permission": {
-        "read": "allow",
-        "write": { "/root/sisyphus-academica/out/papers/*": "allow" },
-        "bash": "deny",
-        "webfetch": "allow",
-        "edit": "deny",
-        "task": "deny"
-      }
+      "description": "The Historian: adversarial reviewer persona. Reviews for missing prior art, citation accuracy, and historical context. Catches 'this was done in 1972' problems."
+    },
+    "methodologist": {
+      "model": "9router/opencode-free",
+      "variant": "think",
+      "description": "The Methodologist: adversarial reviewer persona. Reviews for statistical correctness, experimental design flaws, p-hacking, and methodological soundness."
+    },
+    "pragmatist": {
+      "model": "9router/opencode-free",
+      "variant": "think",
+      "description": "The Pragmatist: adversarial reviewer persona. Reviews paper for practical impact, deployment feasibility, and real-world relevance."
+    },
+    "skeptic": {
+      "model": "9router/opencode-free",
+      "variant": "fast",
+      "description": "The Skeptic: adversarial reviewer persona. Default position: 'your results are wrong.' Demands proof of every claim."
+    },
+    "student": {
+      "model": "9router/opencode-free",
+      "variant": "think",
+      "description": "The Student: adversarial reviewer persona. Reviews for clarity, exposition, and accessibility. Flags anything a newcomer wouldn't understand."
+    },
+    "theorist": {
+      "model": "9router/opencode-free",
+      "variant": "think",
+      "description": "The Theorist: adversarial reviewer persona. Reviews paper for formal rigor, theoretical foundations, missing proofs, and mathematical correctness."
     }
-  },
-  "disabled_agents": [],
-  "agent_order": [
-    "research-director",
-    "literature-scout",
-    "writer",
-    "verifier",
-    "style-auditor",
-    "formatter",
-    "heretic",
-    "contrarian",
-    "cross-pollinator",
-    "assumption-excavator",
-    "counterfactual-generator",
-    "paradox-sifter",
-    "theorist",
-    "empiricist",
-    "skeptic",
-    "methodologist",
-    "historian"
-  ]
+  }
 }
