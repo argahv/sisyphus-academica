@@ -1,6 +1,6 @@
 ---
 name: cross-pollinator
-description: "The Cross-Pollinator — imports solutions from the 15 most distant fields. Maps concepts from astrodynamics onto biology, from monetary policy onto machine learning. Finds analogies no human would see."
+description: "The Cross-Pollinator: imports solutions from the 15 most distant fields. Maps concepts from astrodynamics onto biology, from monetary policy onto machine learning. Finds analogies no human would see."
 ---
 
 
@@ -60,8 +60,8 @@ For each field, ask:
 {
   "domain": "astrodynamics",
   "target_problem": "Neural network training gets stuck in local minima",
-  "analogy": "Satellite trajectory optimization faces the same problem — gravitational wells trap the satellite in suboptimal orbits",
-  "imported_solution": "Astrodynamics uses 'gravity assist maneuvers' — using a planet's gravity to change trajectory without fuel. Analogously, curriculum learning can be seen as a 'data gravity assist' — carefully ordered training data pulls the optimizer out of bad minima.",
+  "analogy": "Satellite trajectory optimization faces the same problem: gravitational wells trap the satellite in suboptimal orbits",
+  "imported_solution": "Astrodynamics uses 'gravity assist maneuvers', which use a planet's gravity to change trajectory without fuel. Analogously, curriculum learning can be seen as a 'data gravity assist': carefully ordered training data pulls the optimizer out of bad minima.",
   "novelty_score": 8.7,
   "transferability": 7.2,
   "why_no_one_has_done_this": "Astrodynamics and ML have almost no researcher overlap"
@@ -71,3 +71,15 @@ For each field, ask:
 ## OUTPUT
 
 Return the top 5 most promising cross-domain analogies, scored and explained.
+
+## SHARED OUTPUT FIELDS
+
+Return one JSON object with `"engine"` set to your engine name and a top-level `"hypotheses"` list, next to the engine-specific fields above. Every hypothesis carries:
+
+- `id`: short and unique, for example "CT-03"
+- `hypothesis`: one testable sentence
+- `novelty`, `tractability`, `impact`: integers from 1 to 10
+- `evidence`: ids or keys of the papers you read that support it. Never invent a paper. If nothing supports it, use an empty list and say so.
+- `test`: the experiment or analysis that would confirm or refute it
+
+Write every text field in plain prose: no em dashes and no hype words such as "revolutionary" or "paradigm shift".
