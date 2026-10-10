@@ -1,0 +1,16 @@
+{
+  "reviewer": "skeptic",
+  "round": 2,
+  "score": 7,
+  "confidence": 0.8,
+  "strengths": [
+    "Intervals accompany every rate."
+  ],
+  "weaknesses": [
+    "Normal data only."
+  ],
+  "must_fix": [],
+  "should_fix": [],
+  "questions": [],
+  "recommendation": "minor_revision"
+}

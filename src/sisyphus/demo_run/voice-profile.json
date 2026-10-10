@@ -1,0 +1,29 @@
+{
+  "created": "2026-10-10",
+  "source_files": [
+    "voice-sample.txt"
+  ],
+  "sample_words": 154,
+  "features": {
+    "sentence_length_mean": 14,
+    "sentence_length_sd": 6.66,
+    "word_length_mean": 4.83,
+    "long_word_ratio": 0.247,
+    "commas_per_sentence": 0.55,
+    "semicolons_per_1000": 0.0,
+    "parentheses_per_1000": 0.0,
+    "first_person_plural_per_1000": 25.97,
+    "passive_per_sentence": 0.091,
+    "hedges_per_1000": 0.0
+  },
+  "guidance": [
+    "Sentences average 14 words; most fall between 7 and 21. Vary length the same way.",
+    "Average word length is 4.8 letters; 25% of words have 7+ letters.",
+    "About 0.6 commas per sentence.",
+    "Semicolons are rare (0.0 per 1000 words).",
+    "Parentheticals are occasional (0.0 per 1000 words).",
+    "First person plural ('we', 'our') appears 26.0 times per 1000 words.",
+    "Passive voice is limited (0.09 per sentence).",
+    "Hedges ('may', 'suggests') appear 0.0 times per 1000 words."
+  ]
+}

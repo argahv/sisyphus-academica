@@ -1,0 +1,16 @@
+{
+  "reviewer": "theorist",
+  "round": 2,
+  "score": 7,
+  "confidence": 0.8,
+  "strengths": [
+    "The mechanism (pooled variance dominated by the larger group) is stated correctly."
+  ],
+  "weaknesses": [
+    "No analytic approximation of the error rate is given."
+  ],
+  "must_fix": [],
+  "should_fix": [],
+  "questions": [],
+  "recommendation": "minor_revision"
+}

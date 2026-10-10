@@ -1,0 +1,16 @@
+{
+  "reviewer": "student",
+  "round": 2,
+  "score": 7,
+  "confidence": 0.8,
+  "strengths": [
+    "Explains why pooling fails in two sentences."
+  ],
+  "weaknesses": [
+    "Could define Type I error at first use."
+  ],
+  "must_fix": [],
+  "should_fix": [],
+  "questions": [],
+  "recommendation": "minor_revision"
+}

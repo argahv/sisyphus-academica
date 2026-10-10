@@ -1,11 +1,11 @@
 [build-system]
 requires = ["setuptools>=68"]
-build-backend = "setuptools.backends._legacy:_Backend"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "sisyphus-academica"
-version = "0.2.0"
-description = "Open-source research pipeline — literature review, novelty generation, citation verification, and adversarial review."
+version = "0.3.0"
+description = "Open-source research pipeline: literature review, novelty generation, citation verification, quality gates and adversarial review."
 readme = "README.md"
 license = {text = "MIT"}
 authors = [
@@ -20,6 +20,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Text Processing :: Markup :: LaTeX",
 ]
@@ -32,13 +33,9 @@ classifiers = [
 [project.optional-dependencies]
 dev = [
     "pytest>=7.4",
-    "pytest-mock>=3.11",
     "flake8>=6.0",
-    "requests>=2.31",
-    "pre-commit>=3.0",
 ]
-all = [
-    "requests>=2.31",
+analysis = [
     "scienceplots>=2.0",
     "seaborn>=0.12",
     "scipy>=1.10",
@@ -48,16 +45,16 @@ all = [
 ]
 
 [project.scripts]
-academica = "sisyphus.cli:main"
+sisyphus = "sisyphus.cli:entrypoint"
+academica = "sisyphus.cli:entrypoint"
 
 [tool.setuptools]
 packages = ["sisyphus", "sisyphus.tools"]
 package-dir = {"sisyphus" = "src/sisyphus", "sisyphus.tools" = "tools"}
 
+[tool.setuptools.package-data]
+sisyphus = ["demo_run/**/*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-
-[tool.flake8]
-max-line-length = 100
-ignore = ["E501", "W291"]

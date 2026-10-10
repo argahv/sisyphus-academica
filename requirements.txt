@@ -1,21 +1,16 @@
-# Sisyphus Academica — Python dependencies
+# Sisyphus Academica: Python dependencies
+# The sisyphus CLI and tools/ use the standard library only (urllib, json, xml, re).
+# These packages are for the data-engineer agent's analysis code and for tests.
 # Install: pip install -r requirements.txt
 
-# Core tools (stdlib-only for citation_verifier.py + literature_client.py)
-# No external deps needed for the Python tools — they use urllib, json, xml, re
-
-# Agent-defined packages used at runtime (installed by data-engineer subagent)
-# These are referenced in agent prompts, not imported by the Python tools:
+# Analysis and figures (used by agent-written analysis.py scripts)
 scienceplots>=2.0     # Publication-quality matplotlib styles
 seaborn>=0.12         # Statistical data visualization
-scipy>=1.10           # Statistical tests, signal processing
+scipy>=1.10           # Statistical tests
 scikit-learn>=1.3     # ML metrics, preprocessing
-statsmodels>=0.14     # Statistical modeling
+statsmodels>=0.14     # Statistical modeling, power analysis
 matplotlib>=3.7       # Base plotting
 
-# HTTP (optional — tools work with stdlib urllib, but requests improves reliability)
-requests>=2.31
-
 # Development
-pytest>=7.4           # Test runner
-pytest-mock>=3.11     # Mocking for API tests
+pytest>=7.4
+flake8>=6.0

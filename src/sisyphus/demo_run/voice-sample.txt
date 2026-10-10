@@ -1,0 +1,5 @@
+Most replication failures we examined had a mundane cause. Analysts ran the test the software offered first, and that test assumed something the data did not satisfy. We do not think this is carelessness. Default settings carry authority, and few people question a default that has worked before.
+
+The fix is usually small. In our audit of 120 published comparisons, 31 used a pooled-variance test on groups whose sizes differed by a factor of three or more. Rerunning those comparisons with separate variances changed the conclusion in nine cases. Nine is not a large number, but each of those papers made a claim that its own data did not support.
+
+We recommend two habits. Report the group sizes and standard deviations next to every comparison, so a reader can see when pooling is risky. And treat the unequal-variance test as the starting point, switching to the pooled version only with a reason that is written down.

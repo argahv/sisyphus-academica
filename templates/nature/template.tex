@@ -1,46 +1,51 @@
-% Sisyphus Academica — Nature/Springer template
-% Uses article class with basic formatting.
-% For submission, use official Springer LaTeX templates from:
+% Sisyphus Academica: Nature/Springer-style template (article class).
+% For submission, move the content into the official Springer Nature template:
 % https://www.springernature.com/gp/authors/campaigns/latex-author-support
+% Nature structure: introduction, results, discussion, then methods. Related
+% work belongs in the introduction. Abstract: about 150 words, no citations.
+% Placeholders in double angle brackets (title, authors, one per section) are filled
+% by `sisyphus build` from outline.json and the draft section files.
 \documentclass[11pt,a4paper]{article}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage{hyperref}
-\usepackage{geometry}
-\geometry{margin=1in}
-\usepackage{cite}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{graphicx}
 \usepackage[font=small,labelfont=bf]{caption}
+\usepackage{booktabs}
+\usepackage[numbers]{natbib}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=1in}
 
-\title{[Paper Title]}
-\author{[Author Name] \\ [Affiliation]}
+\title{<<title>>}
+\author{<<authors>>}
+\date{}
 
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-[Abstract — Nature style: ~150 words, no citations]
+<<abstract>>
 \end{abstract}
 
 \section{Introduction}
-[Introduction]
+<<introduction>>
 
 \section{Results}
-[Results]
+<<results>>
 
 \section{Discussion}
-[Discussion]
+<<discussion>>
 
 \section{Methods}
-[Methods]
+<<methods>>
 
-\section{Data Availability}
-[Data availability statement]
+\section{Data availability}
+<<data_availability>>
 
-\bibliographystyle{plain}
+\bibliographystyle{unsrtnat}
 \bibliography{references}
 
 \end{document}

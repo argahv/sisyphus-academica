@@ -1,0 +1,16 @@
+{
+  "reviewer": "competitor",
+  "round": 2,
+  "score": 7,
+  "confidence": 0.8,
+  "strengths": [
+    "Honest about not extending prior conditions."
+  ],
+  "weaknesses": [
+    "Incremental relative to Ruxton (2006)."
+  ],
+  "must_fix": [],
+  "should_fix": [],
+  "questions": [],
+  "recommendation": "minor_revision"
+}

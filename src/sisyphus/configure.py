@@ -1,65 +1,74 @@
 #!/usr/bin/env python3
-"""Sisyphus Academica — Interactive configuration."""
+"""Sisyphus Academica: configuration of .env and data directories."""
 
 import shutil
+import sys
 from pathlib import Path
+from typing import Optional
+
+from sisyphus.tools import settings
 
 
-def run_configure():
-    """Interactive setup for API keys."""
-    repo_dir = Path(__file__).resolve().parent.parent.parent
+def _ask(prompt: str) -> str:
+    if not sys.stdin.isatty():
+        return ""
+    try:
+        return input(prompt).strip()
+    except EOFError:
+        return ""
+
+
+def run_configure(
+    semantic_scholar_key: Optional[str] = None, crossref_email: Optional[str] = None
+) -> int:
+    """Create .env from .env.example, store API keys, and create data/output directories.
+
+    Prompts only when stdin is a terminal and a value was not passed as a flag.
+    """
+    repo_dir = settings.repo_dir()
     env_example = repo_dir / ".env.example"
     env_file = repo_dir / ".env"
 
-    print("Sisyphus Academica — Configuration")
-    print()
-
+    print("Sisyphus Academica: configuration")
     if not env_file.exists() and env_example.exists():
         shutil.copy(env_example, env_file)
-        print("  Created .env from .env.example")
+        print(f"  Created {env_file} from .env.example")
     elif env_file.exists():
-        print("  .env already exists")
+        print(f"  Using existing {env_file}")
 
-    print()
-    print("  Literature API keys (optional, free):")
-    print()
-
-    ss_key = input("  Semantic Scholar API key? (free — get at semanticscholar.org) [enter to skip]: ").strip()
+    ss_key = semantic_scholar_key or _ask(
+        "  Semantic Scholar API key (free, semanticscholar.org/product/api) [enter to skip]: "
+    )
     if ss_key:
-        _set_env(env_file, "SEMANTIC_SCHOLAR_API_KEY", ss_key)
-        print("  ✓ Saved")
+        set_env(env_file, "SEMANTIC_SCHOLAR_API_KEY", ss_key)
+        print("  Saved SEMANTIC_SCHOLAR_API_KEY")
 
-    crossref_email = input("  CrossRef email? (for higher rate limits) [enter to skip]: ").strip()
-    if crossref_email:
-        _set_env(env_file, "CROSSREF_EMAIL", crossref_email)
-        print("  ✓ Saved")
+    email = crossref_email or _ask(
+        "  Email for the CrossRef/OpenAlex polite pool [enter to skip]: "
+    )
+    if email:
+        set_env(env_file, "CROSSREF_EMAIL", email)
+        print("  Saved CROSSREF_EMAIL")
 
-    print()
-    print("  Done. You can now run:")
-    print("    sisyphus demo")
-
-    # Create output dirs
-    for d in ["out/papers", "out/figures", "data"]:
+    for d in ("out/papers", "data/voice-profile"):
         (repo_dir / d).mkdir(parents=True, exist_ok=True)
+    print("  Voice calibration (optional): put 2-3 paragraphs of your published writing in")
+    print(f"    {repo_dir / 'data' / 'voice-profile'}/*.txt, then run: sisyphus voice")
+    print("  Next: sisyphus demo")
+    return 0
 
 
-def _set_env(env_file: Path, key: str, value: str):
-    """Set a key=value in .env, preserving existing content."""
-    if not env_file.exists():
-        env_file.write_text(f"{key}={value}\n")
-        return
-
-    lines = env_file.read_text().splitlines()
-    found = False
+def set_env(env_file: Path, key: str, value: str) -> None:
+    """Set key=value in .env, preserving other lines."""
+    lines = env_file.read_text(encoding="utf-8").splitlines() if env_file.exists() else []
     for i, line in enumerate(lines):
         if line.startswith(f"{key}="):
             lines[i] = f"{key}={value}"
-            found = True
             break
-    if not found:
+    else:
         lines.append(f"{key}={value}")
-    env_file.write_text("\n".join(lines) + "\n")
+    env_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":
-    run_configure()
+    sys.exit(run_configure())

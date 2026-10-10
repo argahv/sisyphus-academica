@@ -1,0 +1,19 @@
+{
+  "topic": "Type I error of Student's and Welch's t-tests with unequal group sizes",
+  "slug": "demo-welch-vs-student",
+  "venue": "arxiv",
+  "created": "2026-10-10",
+  "sections": [
+    "abstract",
+    "introduction",
+    "related_work",
+    "methods",
+    "results",
+    "discussion",
+    "conclusion"
+  ],
+  "max_review_rounds": 4,
+  "authors": [
+    "Sisyphus Academica demo"
+  ]
+}

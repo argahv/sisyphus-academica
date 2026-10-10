@@ -1,0 +1,16 @@
+{
+  "reviewer": "historian",
+  "round": 2,
+  "score": 7,
+  "confidence": 0.8,
+  "strengths": [
+    "Cites Student, Welch and the main methodological comparisons."
+  ],
+  "weaknesses": [
+    "Could mention Behrens-Fisher history."
+  ],
+  "must_fix": [],
+  "should_fix": [],
+  "questions": [],
+  "recommendation": "minor_revision"
+}

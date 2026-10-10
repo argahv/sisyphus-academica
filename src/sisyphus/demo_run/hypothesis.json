@@ -1,0 +1,14 @@
+{
+  "primary_claim": "With a small high-variance group and a large low-variance group, Student's t-test rejects a true null far more often than the nominal 5%, while Welch's test stays near 5%.",
+  "paper_type": "empirical",
+  "gap": "Prior comparisons report error rates across many conditions; few give a reproducible, interval-based estimate for the common small-treatment, large-control design.",
+  "proposed_approach": "Monte Carlo simulation with paired comparison of rejection decisions (McNemar) and Wilson intervals.",
+  "novelty_source": {
+    "engine": "assumption-excavator",
+    "id": "AE-002"
+  },
+  "supporting_evidence": [
+    "ruxton2006unequal",
+    "delacre2017why"
+  ]
+}

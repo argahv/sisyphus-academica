@@ -1,0 +1,23 @@
+{
+  "design": "Monte Carlo simulation, 4000 replications, equal means, n=10 (sd 3) vs n=40 (sd 1).",
+  "statistical_tests": [
+    {
+      "hypothesis": "Student and Welch reject at different rates",
+      "test": "McNemar (paired proportions)"
+    },
+    {
+      "hypothesis": "Welch rejects at the nominal rate",
+      "test": "one-sample z test for a proportion"
+    }
+  ],
+  "sample_size_justification": "4000 replications give a Wilson half-width under 1.5 percentage points at rates near 25%.",
+  "threats_to_validity": [
+    "single variance ratio",
+    "normal data only"
+  ],
+  "reproducibility": {
+    "seed": 2026,
+    "code": "analysis/analysis.py",
+    "dependencies": "Python standard library"
+  }
+}
