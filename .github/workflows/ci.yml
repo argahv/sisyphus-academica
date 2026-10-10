@@ -17,7 +17,7 @@ jobs:
       - name: Lint
         run: |
           pip install flake8
-          flake8 tools/ --max-line-length=100 --ignore=E501,W291
+          flake8 tools/ src/ tests/ --max-line-length=100
 
   test:
     runs-on: ubuntu-latest
@@ -29,21 +29,24 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install deps
-        run: pip install pytest
+      - name: Install
+        run: pip install -e ".[dev]"
       - name: Run tests
         run: python -m pytest tests/ -v
+      - name: CLI smoke test
+        run: |
+          sisyphus --help
+          sisyphus demo
 
   check-structure:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Verify required files exist
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - name: Installer and agents
         run: |
-          for f in LICENSE README.md .env.example install.sh config/agent-config.json orchestrator/research-director.md; do
-            test -f "$f" || { echo "MISSING: $f"; exit 1; }
-          done
-          for d in subagents novelty-engines reviewers templates tools; do
-            test -d "$d" || { echo "MISSING dir: $d"; exit 1; }
-          done
-          echo "All required files present."
+          bash -n install.sh
+          python3 tools/agents.py --dest "$RUNNER_TEMP/agents"
+          bash install.sh --yes

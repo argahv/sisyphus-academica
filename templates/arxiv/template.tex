@@ -1,38 +1,25 @@
-% Sisyphus Academica — arXiv template
-% Uses standard article class with optional hyperref/geometry
+% Sisyphus Academica: arXiv template (standard article class)
+% Placeholders in double angle brackets (title, authors, one per section) are filled
+% by `sisyphus build` from outline.json and the draft section files.
 \documentclass[11pt,a4paper]{article}
 
-% Encoding
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-
-% Math
 \usepackage{amsmath,amssymb,amsthm}
-
-% Graphics
 \usepackage{graphicx}
 \usepackage[font=small,labelfont=bf]{caption}
 \usepackage{subcaption}
-
-% References
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage[numbers]{natbib}
 \usepackage{hyperref}
-\usepackage{cite}
-
-% Layout
 \usepackage{geometry}
 \geometry{margin=1in}
 
-% Algorithms
-\usepackage{algorithm}
-\usepackage{algpseudocode}
-
-% Tables
-\usepackage{booktabs}
-\usepackage{array}
-
-% Metadata
-\title{[Paper Title]}
-\author{[Author Name]}
+\title{<<title>>}
+\author{<<authors>>}
 \date{\today}
 
 \begin{document}
@@ -40,34 +27,28 @@
 \maketitle
 
 \begin{abstract}
-[Abstract goes here]
+<<abstract>>
 \end{abstract}
 
 \section{Introduction}
+<<introduction>>
 
-[Introduction]
+\section{Related work}
+<<related_work>>
 
-\section{Related Work}
+\section{Methods}
+<<methods>>
 
-[Related work]
-
-\section{Method}
-
-[Method]
-
-\section{Experiments}
-
-[Experiments and results]
+\section{Results}
+<<results>>
 
 \section{Discussion}
-
-[Discussion]
+<<discussion>>
 
 \section{Conclusion}
+<<conclusion>>
 
-[Conclusion]
-
-\bibliographystyle{plain}
+\bibliographystyle{plainnat}
 \bibliography{references}
 
 \end{document}

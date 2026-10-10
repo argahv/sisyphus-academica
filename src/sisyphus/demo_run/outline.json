@@ -1,0 +1,72 @@
+{
+  "title": "Student's t-test inflates false positives when the small group is the noisy one",
+  "authors": [
+    "Sisyphus Academica demo"
+  ],
+  "claim": "Student's test rejects a true null in about a quarter of datasets in the small-noisy-group design; Welch's test holds 5%.",
+  "contributions": [
+    "Reproducible estimate of both error rates with Wilson intervals",
+    "Paired McNemar comparison of the two tests on identical datasets"
+  ],
+  "terminology": {
+    "Student's test": "pooled-variance two-sample t-test",
+    "Welch's test": "separate-variance t-test with Welch-Satterthwaite df",
+    "rejection rate": "share of datasets with p < 0.05"
+  },
+  "numbers": {
+    "student_rate": "26.5%",
+    "welch_rate": "5.4%",
+    "discordant": 842
+  },
+  "sections": {
+    "abstract": {
+      "purpose": "problem, design, both rates, recommendation",
+      "key_points": [],
+      "cites": []
+    },
+    "introduction": {
+      "purpose": "why pooling fails; contribution",
+      "key_points": [],
+      "cites": [
+        "student1908probable",
+        "welch1947generalization",
+        "ruxton2006unequal",
+        "delacre2017why"
+      ]
+    },
+    "related_work": {
+      "purpose": "what is already known",
+      "key_points": [],
+      "cites": [
+        "ruxton2006unequal",
+        "delacre2017why"
+      ]
+    },
+    "methods": {
+      "purpose": "simulation and tests",
+      "key_points": [],
+      "cites": [
+        "welch1947generalization",
+        "wilson1927probable",
+        "mcnemar1947note"
+      ]
+    },
+    "results": {
+      "purpose": "rates, intervals, paired test",
+      "key_points": [],
+      "cites": []
+    },
+    "discussion": {
+      "purpose": "mechanism, scope, next experiment",
+      "key_points": [],
+      "cites": [
+        "ruxton2006unequal"
+      ]
+    },
+    "conclusion": {
+      "purpose": "recommendation",
+      "key_points": [],
+      "cites": []
+    }
+  }
+}

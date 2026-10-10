@@ -1,0 +1,16 @@
+{
+  "reviewer": "methodologist",
+  "round": 2,
+  "score": 7,
+  "confidence": 0.8,
+  "strengths": [
+    "McNemar is the right test for paired decisions on the same datasets."
+  ],
+  "weaknesses": [
+    "States the z test for the nominal rate but not its continuity assumptions."
+  ],
+  "must_fix": [],
+  "should_fix": [],
+  "questions": [],
+  "recommendation": "minor_revision"
+}

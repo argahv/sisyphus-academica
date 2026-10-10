@@ -1,0 +1,16 @@
+{
+  "reviewer": "ethicist",
+  "round": 2,
+  "score": 7,
+  "confidence": 0.8,
+  "strengths": [
+    "No human data; low risk."
+  ],
+  "weaknesses": [
+    "None."
+  ],
+  "must_fix": [],
+  "should_fix": [],
+  "questions": [],
+  "recommendation": "minor_revision"
+}

@@ -1,0 +1,16 @@
+{
+  "reviewer": "empiricist",
+  "round": 2,
+  "score": 7,
+  "confidence": 0.8,
+  "strengths": [
+    "Seed, replications and code are reported; results regenerate exactly."
+  ],
+  "weaknesses": [
+    "Only one variance ratio is simulated."
+  ],
+  "must_fix": [],
+  "should_fix": [],
+  "questions": [],
+  "recommendation": "minor_revision"
+}

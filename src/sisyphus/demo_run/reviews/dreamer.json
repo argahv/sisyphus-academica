@@ -1,0 +1,16 @@
+{
+  "reviewer": "dreamer",
+  "round": 2,
+  "score": 7,
+  "confidence": 0.8,
+  "strengths": [
+    "Proposes a concrete follow-up grid."
+  ],
+  "weaknesses": [
+    "Could run the grid instead of proposing it."
+  ],
+  "must_fix": [],
+  "should_fix": [],
+  "questions": [],
+  "recommendation": "minor_revision"
+}

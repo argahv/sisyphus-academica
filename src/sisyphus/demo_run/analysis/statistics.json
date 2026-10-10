@@ -1,0 +1,48 @@
+{
+  "data_source": "Monte Carlo simulation in analysis.py (seed 2026, 4000 replications)",
+  "design": {
+    "n_small": 10,
+    "sd_small": 3.0,
+    "n_large": 40,
+    "sd_large": 1.0,
+    "alpha": 0.05,
+    "true_difference": 0
+  },
+  "rates": {
+    "student": {
+      "rejections": 1058,
+      "rate": 0.2645,
+      "wilson_95": [
+        0.2511,
+        0.2784
+      ]
+    },
+    "welch": {
+      "rejections": 216,
+      "rate": 0.054,
+      "wilson_95": [
+        0.0474,
+        0.0614
+      ]
+    }
+  },
+  "tests": [
+    {
+      "name": "McNemar test, Student vs Welch rejections",
+      "statistic": 842.0,
+      "df": [
+        1
+      ],
+      "p_value": 3.988346370296783e-185,
+      "discordant": [
+        842,
+        0
+      ]
+    },
+    {
+      "name": "z test, Welch rejection rate vs nominal 0.05",
+      "statistic": 1.16,
+      "p_value": 0.24573870033984963
+    }
+  ]
+}

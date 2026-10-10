@@ -1,0 +1,280 @@
+{
+  "references": [
+    {
+      "key": "student1908probable",
+      "title": "The probable error of a mean",
+      "authors": [
+        "Student"
+      ],
+      "year": 1908,
+      "doi": "10.1093/biomet/6.1.1",
+      "venue": "Biometrika",
+      "type": "article",
+      "volume": "6",
+      "pages": "1-25",
+      "verification": {
+        "key": "student1908probable",
+        "title": "The probable error of a mean",
+        "verified": true,
+        "found_in": [
+          "semantic_scholar",
+          "crossref"
+        ],
+        "matches": {
+          "semantic_scholar": {
+            "title": "The probable error of a mean",
+            "year": 1908,
+            "doi": "10.1093/biomet/6.1.1",
+            "venue": "Biometrika",
+            "authors": [
+              "Student"
+            ]
+          },
+          "crossref": {
+            "title": "The probable error of a mean",
+            "year": 1908,
+            "doi": "10.1093/biomet/6.1.1",
+            "venue": "Biometrika",
+            "authors": [
+              "Student"
+            ]
+          }
+        },
+        "issues": [],
+        "fingerprint": "student1908probable|the probable error of a mean|10.1093/biomet/6.1.1",
+        "note": "cached demo fixture; run `sisyphus gate citations RUN --refresh` to check live"
+      }
+    },
+    {
+      "key": "welch1947generalization",
+      "title": "The generalization of 'Student's' problem when several different population variances are involved",
+      "authors": [
+        "B. L. Welch"
+      ],
+      "year": 1947,
+      "doi": "10.1093/biomet/34.1-2.28",
+      "venue": "Biometrika",
+      "type": "article",
+      "volume": "34",
+      "pages": "28-35",
+      "verification": {
+        "key": "welch1947generalization",
+        "title": "The generalization of 'Student's' problem when several different population variances are involved",
+        "verified": true,
+        "found_in": [
+          "semantic_scholar",
+          "crossref"
+        ],
+        "matches": {
+          "semantic_scholar": {
+            "title": "The generalization of 'Student's' problem when several different population variances are involved",
+            "year": 1947,
+            "doi": "10.1093/biomet/34.1-2.28",
+            "venue": "Biometrika",
+            "authors": [
+              "B. L. Welch"
+            ]
+          },
+          "crossref": {
+            "title": "The generalization of 'Student's' problem when several different population variances are involved",
+            "year": 1947,
+            "doi": "10.1093/biomet/34.1-2.28",
+            "venue": "Biometrika",
+            "authors": [
+              "B. L. Welch"
+            ]
+          }
+        },
+        "issues": [],
+        "fingerprint": "welch1947generalization|the generalization of student s problem when several different population variances are involved|10.1093/biomet/34.1-2.28",
+        "note": "cached demo fixture; run `sisyphus gate citations RUN --refresh` to check live"
+      }
+    },
+    {
+      "key": "ruxton2006unequal",
+      "title": "The unequal variance t-test is an underused alternative to Student's t-test and the Mann-Whitney U test",
+      "authors": [
+        "Graeme D. Ruxton"
+      ],
+      "year": 2006,
+      "doi": "10.1093/beheco/ark016",
+      "venue": "Behavioral Ecology",
+      "type": "article",
+      "volume": "17",
+      "pages": "688-690",
+      "verification": {
+        "key": "ruxton2006unequal",
+        "title": "The unequal variance t-test is an underused alternative to Student's t-test and the Mann-Whitney U test",
+        "verified": true,
+        "found_in": [
+          "semantic_scholar",
+          "crossref"
+        ],
+        "matches": {
+          "semantic_scholar": {
+            "title": "The unequal variance t-test is an underused alternative to Student's t-test and the Mann-Whitney U test",
+            "year": 2006,
+            "doi": "10.1093/beheco/ark016",
+            "venue": "Behavioral Ecology",
+            "authors": [
+              "Graeme D. Ruxton"
+            ]
+          },
+          "crossref": {
+            "title": "The unequal variance t-test is an underused alternative to Student's t-test and the Mann-Whitney U test",
+            "year": 2006,
+            "doi": "10.1093/beheco/ark016",
+            "venue": "Behavioral Ecology",
+            "authors": [
+              "Graeme D. Ruxton"
+            ]
+          }
+        },
+        "issues": [],
+        "fingerprint": "ruxton2006unequal|the unequal variance t test is an underused alternative to student s t test and the mann whitney u test|10.1093/beheco/ark016",
+        "note": "cached demo fixture; run `sisyphus gate citations RUN --refresh` to check live"
+      }
+    },
+    {
+      "key": "delacre2017why",
+      "title": "Why psychologists should by default use Welch's t-test instead of Student's t-test",
+      "authors": [
+        "Marie Delacre",
+        "Daniel Lakens",
+        "Christophe Leys"
+      ],
+      "year": 2017,
+      "doi": "10.5334/irsp.82",
+      "venue": "International Review of Social Psychology",
+      "type": "article",
+      "volume": "30",
+      "pages": "92-101",
+      "verification": {
+        "key": "delacre2017why",
+        "title": "Why psychologists should by default use Welch's t-test instead of Student's t-test",
+        "verified": true,
+        "found_in": [
+          "semantic_scholar",
+          "crossref"
+        ],
+        "matches": {
+          "semantic_scholar": {
+            "title": "Why psychologists should by default use Welch's t-test instead of Student's t-test",
+            "year": 2017,
+            "doi": "10.5334/irsp.82",
+            "venue": "International Review of Social Psychology",
+            "authors": [
+              "Marie Delacre",
+              "Daniel Lakens",
+              "Christophe Leys"
+            ]
+          },
+          "crossref": {
+            "title": "Why psychologists should by default use Welch's t-test instead of Student's t-test",
+            "year": 2017,
+            "doi": "10.5334/irsp.82",
+            "venue": "International Review of Social Psychology",
+            "authors": [
+              "Marie Delacre",
+              "Daniel Lakens",
+              "Christophe Leys"
+            ]
+          }
+        },
+        "issues": [],
+        "fingerprint": "delacre2017why|why psychologists should by default use welch s t test instead of student s t test|10.5334/irsp.82",
+        "note": "cached demo fixture; run `sisyphus gate citations RUN --refresh` to check live"
+      }
+    },
+    {
+      "key": "mcnemar1947note",
+      "title": "Note on the sampling error of the difference between correlated proportions or percentages",
+      "authors": [
+        "Quinn McNemar"
+      ],
+      "year": 1947,
+      "doi": "10.1007/BF02295996",
+      "venue": "Psychometrika",
+      "type": "article",
+      "volume": "12",
+      "pages": "153-157",
+      "verification": {
+        "key": "mcnemar1947note",
+        "title": "Note on the sampling error of the difference between correlated proportions or percentages",
+        "verified": true,
+        "found_in": [
+          "semantic_scholar",
+          "crossref"
+        ],
+        "matches": {
+          "semantic_scholar": {
+            "title": "Note on the sampling error of the difference between correlated proportions or percentages",
+            "year": 1947,
+            "doi": "10.1007/BF02295996",
+            "venue": "Psychometrika",
+            "authors": [
+              "Quinn McNemar"
+            ]
+          },
+          "crossref": {
+            "title": "Note on the sampling error of the difference between correlated proportions or percentages",
+            "year": 1947,
+            "doi": "10.1007/BF02295996",
+            "venue": "Psychometrika",
+            "authors": [
+              "Quinn McNemar"
+            ]
+          }
+        },
+        "issues": [],
+        "fingerprint": "mcnemar1947note|note on the sampling error of the difference between correlated proportions or percentages|10.1007/BF02295996",
+        "note": "cached demo fixture; run `sisyphus gate citations RUN --refresh` to check live"
+      }
+    },
+    {
+      "key": "wilson1927probable",
+      "title": "Probable inference, the law of succession, and statistical inference",
+      "authors": [
+        "Edwin B. Wilson"
+      ],
+      "year": 1927,
+      "doi": "10.1080/01621459.1927.10502953",
+      "venue": "Journal of the American Statistical Association",
+      "type": "article",
+      "volume": "22",
+      "pages": "209-212",
+      "verification": {
+        "key": "wilson1927probable",
+        "title": "Probable inference, the law of succession, and statistical inference",
+        "verified": true,
+        "found_in": [
+          "semantic_scholar",
+          "crossref"
+        ],
+        "matches": {
+          "semantic_scholar": {
+            "title": "Probable inference, the law of succession, and statistical inference",
+            "year": 1927,
+            "doi": "10.1080/01621459.1927.10502953",
+            "venue": "Journal of the American Statistical Association",
+            "authors": [
+              "Edwin B. Wilson"
+            ]
+          },
+          "crossref": {
+            "title": "Probable inference, the law of succession, and statistical inference",
+            "year": 1927,
+            "doi": "10.1080/01621459.1927.10502953",
+            "venue": "Journal of the American Statistical Association",
+            "authors": [
+              "Edwin B. Wilson"
+            ]
+          }
+        },
+        "issues": [],
+        "fingerprint": "wilson1927probable|probable inference the law of succession and statistical inference|10.1080/01621459.1927.10502953",
+        "note": "cached demo fixture; run `sisyphus gate citations RUN --refresh` to check live"
+      }
+    }
+  ]
+}

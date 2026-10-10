@@ -1,0 +1,16 @@
+{
+  "reviewer": "pragmatist",
+  "round": 2,
+  "score": 7,
+  "confidence": 0.8,
+  "strengths": [
+    "The recommendation is cheap to adopt."
+  ],
+  "weaknesses": [
+    "Does not quantify the power cost of Welch when variances are equal."
+  ],
+  "must_fix": [],
+  "should_fix": [],
+  "questions": [],
+  "recommendation": "minor_revision"
+}

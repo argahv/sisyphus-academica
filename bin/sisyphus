@@ -1,0 +1,7 @@
+#!/bin/sh
+# Run the sisyphus CLI from this checkout without installing it (stdlib only).
+# install.sh puts a wrapper on PATH that points here.
+SELF="$0"
+[ -L "$SELF" ] && SELF="$(readlink "$SELF")"
+DIR="$(cd "$(dirname "$SELF")/.." && pwd)"
+PYTHONPATH="$DIR/src${PYTHONPATH:+:$PYTHONPATH}" exec python3 -m sisyphus.cli "$@"
