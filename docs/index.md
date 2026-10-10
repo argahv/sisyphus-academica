@@ -64,7 +64,7 @@ title: Home
 
 <div class="proof-bar">
   <span class="proof-badge">SIREN paper</span>
-  <span>13-page PDF · 26 verified citations · 3 figures · 0 hallucinated references · <a href="https://github.com/argahv/sisyphus-academica/blob/main/examples/siren-paper/siren-paper.pdf">download PDF</a></span>
+  <span>13-page PDF · 20 cited references · 2 figures · <a href="https://github.com/argahv/sisyphus-academica/blob/main/examples/siren-paper/README.md">what the current gates flag</a> · <a href="https://github.com/argahv/sisyphus-academica/blob/main/examples/siren-paper/siren-paper.pdf">download PDF</a></span>
 </div>
 
 ---
